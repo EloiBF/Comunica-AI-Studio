@@ -1,52 +1,271 @@
+
 {% extends "base_authenticated.html" %}
-{% block title %}El meu context{% endblock %}
+{% block title %}El meu context - Comunica AI Studio{% endblock %}
 
 {% block content %}
-<h1>El meu Context</h1>
+<!-- Header -->
+    <header style="margin-bottom: var(--space-8);">
+        <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4);">
+            <div style="background: linear-gradient(135deg, var(--warning-500), var(--warning-600)); width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polygon points="10,8 16,12 10,16 10,8"/>
+                </svg>
+            </div>
+            <div>
+                <h1 style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--gray-900); margin: 0;">
+                    El meu Context
+                </h1>
+                <p style="color: var(--gray-600); margin: 0; font-size: var(--font-size-base);">
+                    Defineix el context de la teva empresa per obtenir comunicacions més precises
+                </p>
+            </div>
+        </div>
+        
+        <!-- Info banner -->
+        <div style="background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%); border: 1px solid var(--primary-200); border-radius: var(--radius-lg); padding: var(--space-4); margin-bottom: var(--space-6);">
+            <div style="display: flex; align-items: start; gap: var(--space-3);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--primary-600)" style="margin-top: 2px; flex-shrink: 0;">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4"/>
+                    <path d="M12 8h.01"/>
+                </svg>
+                <div>
+                    <h3 style="color: var(--primary-800); font-weight: 600; margin: 0 0 var(--space-1) 0; font-size: var(--font-size-sm);">
+                        Personalitza la teva IA
+                    </h3>
+                    <p style="color: var(--primary-700); margin: 0; font-size: var(--font-size-sm); line-height: 1.5;">
+                        Comparteix informació sobre la teva empresa, sector i estil de comunicació per obtenir resultats més personalitzats i coherents amb la teva marca.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </header>
 
-<form method="post">
-    {% csrf_token %}
+    <!-- Context form -->
+    <form method="post" style="max-width: 800px;">
+        {% csrf_token %}
 
-    <div class="context-block">
-        <label for="title_1">Nom del context 1</label>
-        <input type="text" id="title_1" name="title_1">
+        <div style="display: grid; gap: var(--space-6);">
+            <!-- Context 1 -->
+            <div class="context-block">
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4);">
+                    <div style="background: var(--primary-100); width: 32px; height: 32px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--primary-700); font-weight: 600; font-size: var(--font-size-sm);">
+                        1
+                    </div>
+                    <h3 style="color: var(--gray-900); margin: 0; font-weight: 600; font-size: var(--font-size-lg);">
+                        Informació de l'empresa
+                    </h3>
+                </div>
+                
+                <div class="form-group">
+                    <label for="title_1" class="form-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
+                            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5Z"/>
+                        </svg>
+                        Nom del context
+                    </label>
+                    <input 
+                        type="text" 
+                        id="title_1" 
+                        name="title_1" 
+                        class="form-input"
+                        placeholder="Ex: Informació general de l'empresa"
+                        value=""
+                    >
+                </div>
 
-        <label for="content_1">Context 1</label>
-        <textarea id="content_1" name="content_1" rows="4"></textarea>
-    </div>
+                <div class="form-group">
+                    <label for="content_1" class="form-label">Context detallat</label>
+                    <textarea 
+                        id="content_1" 
+                        name="content_1" 
+                        class="form-textarea"
+                        rows="4"
+                        placeholder="Descriu la teva empresa: sector, missió, valors, públic objectiu, estil de comunicació preferit..."
+                    ></textarea>
+                </div>
+            </div>
 
-    <div class="context-block">
-        <label for="title_2">Nom del context 2</label>
-        <input type="text" id="title_2" name="title_2">
+            <!-- Context 2 -->
+            <div class="context-block">
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4);">
+                    <div style="background: var(--success-100); width: 32px; height: 32px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--success-700); font-weight: 600; font-size: var(--font-size-sm);">
+                        2
+                    </div>
+                    <h3 style="color: var(--gray-900); margin: 0; font-weight: 600; font-size: var(--font-size-lg);">
+                        Productes i serveis
+                    </h3>
+                </div>
+                
+                <div class="form-group">
+                    <label for="title_2" class="form-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        Nom del context
+                    </label>
+                    <input 
+                        type="text" 
+                        id="title_2" 
+                        name="title_2" 
+                        class="form-input"
+                        placeholder="Ex: Catàleg de productes principals"
+                        value=""
+                    >
+                </div>
 
-        <label for="content_2">Context 2</label>
-        <textarea id="content_2" name="content_2" rows="4"></textarea>
-    </div>
+                <div class="form-group">
+                    <label for="content_2" class="form-label">Context detallat</label>
+                    <textarea 
+                        id="content_2" 
+                        name="content_2" 
+                        class="form-textarea"
+                        rows="4"
+                        placeholder="Detalla els teus productes o serveis principals, característiques úniques, avantatges competitius..."
+                    ></textarea>
+                </div>
+            </div>
 
-    <div class="context-block">
-        <label for="title_3">Nom del context 3</label>
-        <input type="text" id="title_3" name="title_3">
+            <!-- Context 3 -->
+            <div class="context-block">
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4);">
+                    <div style="background: var(--warning-100); width: 32px; height: 32px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--warning-700); font-weight: 600; font-size: var(--font-size-sm);">
+                        3
+                    </div>
+                    <h3 style="color: var(--gray-900); margin: 0; font-weight: 600; font-size: var(--font-size-lg);">
+                        Públic objectiu
+                    </h3>
+                </div>
+                
+                <div class="form-group">
+                    <label for="title_3" class="form-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        Nom del context
+                    </label>
+                    <input 
+                        type="text" 
+                        id="title_3" 
+                        name="title_3" 
+                        class="form-input"
+                        placeholder="Ex: Perfil dels nostres clients"
+                        value=""
+                    >
+                </div>
 
-        <label for="content_3">Context 3</label>
-        <textarea id="content_3" name="content_3" rows="4"></textarea>
-    </div>
+                <div class="form-group">
+                    <label for="content_3" class="form-label">Context detallat</label>
+                    <textarea 
+                        id="content_3" 
+                        name="content_3" 
+                        class="form-textarea"
+                        rows="4"
+                        placeholder="Descriu el teu públic objectiu: demografia, interessos, necessitats, comportament de compra..."
+                    ></textarea>
+                </div>
+            </div>
 
-    <div class="context-block">
-        <label for="title_4">Nom del context 4</label>
-        <input type="text" id="title_4" name="title_4">
+            <!-- Context 4 -->
+            <div class="context-block">
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4);">
+                    <div style="background: var(--gray-100); width: 32px; height: 32px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--gray-700); font-weight: 600; font-size: var(--font-size-sm);">
+                        4
+                    </div>
+                    <h3 style="color: var(--gray-900); margin: 0; font-weight: 600; font-size: var(--font-size-lg);">
+                        Context addicional
+                    </h3>
+                </div>
+                
+                <div class="form-group">
+                    <label for="title_4" class="form-label">Nom del context</label>
+                    <input 
+                        type="text" 
+                        id="title_4" 
+                        name="title_4" 
+                        class="form-input"
+                        placeholder="Ex: Estratègia de màrqueting actual"
+                        value=""
+                    >
+                </div>
 
-        <label for="content_4">Context 4</label>
-        <textarea id="content_4" name="content_4" rows="4"></textarea>
-    </div>
+                <div class="form-group">
+                    <label for="content_4" class="form-label">Context detallat</label>
+                    <textarea 
+                        id="content_4" 
+                        name="content_4" 
+                        class="form-textarea"
+                        rows="4"
+                        placeholder="Afegeix qualsevol altra informació rellevant per personalitzar les comunicacions..."
+                    ></textarea>
+                </div>
+            </div>
 
-    <div class="context-block">
-        <label for="title_5">Nom del context 5</label>
-        <input type="text" id="title_5" name="title_5">
+            <!-- Context 5 -->
+            <div class="context-block">
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4);">
+                    <div style="background: var(--primary-100); width: 32px; height: 32px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--primary-700); font-weight: 600; font-size: var(--font-size-sm);">
+                        5
+                    </div>
+                    <h3 style="color: var(--gray-900); margin: 0; font-weight: 600; font-size: var(--font-size-lg);">
+                        Context personalitzat
+                    </h3>
+                </div>
+                
+                <div class="form-group">
+                    <label for="title_5" class="form-label">Nom del context</label>
+                    <input 
+                        type="text" 
+                        id="title_5" 
+                        name="title_5" 
+                        class="form-input"
+                        placeholder="Ex: Especificacions tècniques"
+                        value=""
+                    >
+                </div>
 
-        <label for="content_5">Context 5</label>
-        <textarea id="content_5" name="content_5" rows="4"></textarea>
-    </div>
+                <div class="form-group">
+                    <label for="content_5" class="form-label">Context detallat</label>
+                    <textarea 
+                        id="content_5" 
+                        name="content_5" 
+                        class="form-textarea"
+                        rows="4"
+                        placeholder="Context lliure per a qualsevol informació específica del teu negoci..."
+                    ></textarea>
+                </div>
+            </div>
+        </div>
 
-    <button type="submit">Desar</button>
-</form>
+        <!-- Form actions -->
+        <div style="margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--gray-200); display: flex; gap: var(--space-4); justify-content: space-between; align-items: center;">
+            <p style="color: var(--gray-500); font-size: var(--font-size-sm); margin: 0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
+                    <path d="M12 22c5.421 0 9.81-4.477 9.81-10S17.421 2 12 2 2.19 6.477 2.19 12s4.389 10 9.81 10Z"/>
+                    <path d="M8 12h8"/>
+                    <path d="M12 8v8"/>
+                </svg>
+                Els canvis es desaran automàticament
+            </p>
+            <div style="display: flex; gap: var(--space-3);">
+                <button type="button" class="btn btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: var(--space-1);">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                        <path d="M3 3v5h5"/>
+                    </svg>
+                    Reiniciar
+                </button>
+                <button type="submit" class="btn btn-success btn-lg">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: var(--space-1);">
+                        <polyline points="20,6 9,17 4,12"/>
+                    </svg>
+                    Desar Context
+                </button>
+            </div>
+        </div>
+    </form>
 {% endblock %}

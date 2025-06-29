@@ -13,106 +13,38 @@ from sklearn.preprocessing import RobustScaler
 from kneed import KneeLocator
 import groq  
 from sklearn.metrics import silhouette_score
+import json
+from pathlib import Path
+
+# Definim entorn on s'executarà aquest script (com si fos el root)
+base_dir = Path(__file__).resolve().parent.parent.parent  # Aquí, puja un nivell més alt per arribar a l'arrel
+sys.path.append(str(base_dir))
+
+# Importem funcions necessàries
+from app.scripts.utils import prompt_AI, get_clean_table_name, get_user_db_path, get_user_folder_path
 
 
 
-# Access environment variables
-# --- CONFIGURATION ---
+# Configura les rutes de les dades i arxius
+DATA_DIR = 'input/data_example/'
+DATABASE_DIR = 'users/data/'
+DEFAULT_DB_NAME = 'user_database'
 
-def resource_path(relative_path):
-       if hasattr(sys, '_MEIPASS'):
-           return os.path.join(sys._MEIPASS, relative_path)
-       return os.path.join(os.path.abspath("."), relative_path)
+def get_user_db_path(username, db_name=DEFAULT_DB_NAME):
+    """
+    Retorna el camí de la base de dades per l'usuari
+    """
+    return os.path.join(DATABASE_DIR, f'{username}_{db_name}.db')
 
-load_dotenv(resource_path('.env'))
-API_VERSION = os.getenv('API_VERSION')
-API_KEY = os.getenv('API_KEY')
-ENDPOINT = os.getenv('ENDPOINT')
-AZURE_MODEL = os.getenv('AZURE_MODEL')
-METODO_CONEXIO = os.getenv("METODO_CONEXIO")
-if not API_KEY:
-    print("Aviso: No se ha encontrado la variable de entorno API_KEY.")
-    
-def retry(max_attempts=3, wait=1, step_name="Step"):
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            attempt = 0
-            while attempt < max_attempts:
-                try:
-                    return func(*args, **kwargs)
-                except Exception as e:
-                    attempt += 1
-                    print(f"[{step_name}] Error: {e} (attempt {attempt}/{max_attempts})")
-                    if attempt >= max_attempts:
-                        print(f"[{step_name}] Permanent failure after {max_attempts} attempts.")
-                        raise
-                    time.sleep(wait)
-        return wrapper
-    return decorator
-
-# --- AI UTILITIES ---
-
-def prompt_ia_client(prompt):
-
-    client = AzureOpenAI(
-    api_key=API_KEY,
-    api_version=API_VERSION,
-    azure_endpoint=ENDPOINT,
-    )
-
-    query = prompt
-    
-    respuesta = client.chat.completions.create(
-        model=AZURE_MODEL,
-        messages=[{"role": "user", "content": query}],
-        max_tokens=500
-    )
-    if respuesta and respuesta.choices and respuesta.choices[0].message and respuesta.choices[0].message.content:
-        respuesta = respuesta.choices[0].message.content.strip()
-        return respuesta
-    
-    return None
-
-def prompt_ia_v2(prompt, api_base_url=ENDPOINT, api_key=API_KEY, model_deployment_name = AZURE_MODEL, api_version=API_VERSION, ):
-    api_url = f"{api_base_url}/{model_deployment_name}/chat/completions?api-version={api_version}"
-    headers = {
-        "api-key": api_key,
-        "Content-Type": "application/json"
-    }
-
-    data = {
-        "messages": [
-      {
-       "role": "system",
-       "content": "You are an AI assistant that helps people find information."
-      },
-     {
-      "role": "user",
-      "content": prompt
-       }
-    ],
-        "temperature": 0.2,
-        "top_p": 1,
-        "frequency_penalty": 0,
-        "presence_penalty": 0,
-        "max_tokens": 2000,
-        "stop": None
-    }
-
-    response = requests.post(api_url, json=data, headers=headers, stream=True)
-    respuesta= json.loads(response.text)
-    texto = respuesta["choices"][0]["message"]["content"]
-    return texto
-
-# Amb aquesta funció podem cridar a la IA
-def prompt_AI(prompt, conexion = METODO_CONEXIO):
-    if conexion == "2":
-        return prompt_ia_client(prompt)
-    elif conexion == "1":
-        return prompt_ia_v2(prompt)
-    else:
-        return None
+def load_user_file_to_sqlite(file_path, username):
+    """
+    Carrega un fitxer CSV a una base de dades SQLite de l'usuari
+    """
+    conn = sqlite3.connect(get_user_db_path(username))
+    df = pd.read_csv(file_path)
+    df.to_sql('NEW_TABLE', conn, if_exists='replace', index=False)
+    conn.close()
+    return 'NEW_TABLE'
 
 # --- CLEAN AI SQL RESPONSE ---
 
@@ -122,29 +54,39 @@ def clean_sql_statements(text):
 
 # --- SQLITE & DATA UTILITIES ---
 
-def load_file_data_to_sqlite(conn, file, table_name):
-    _, ext = os.path.splitext(file)
+def load_user_file_to_sqlite(file_path, username):
+    db_path = get_user_db_path(username)
+    conn = sqlite3.connect(db_path)
+    table_name = get_clean_table_name(file_path)
+
+    # Determinar format
+    _, ext = os.path.splitext(file_path)
     ext = ext.lower()
     if ext in ['.xlsx', '.xls']:
-        df = pd.read_excel(file)
+        df = pd.read_excel(file_path)
     elif ext == '.csv':
         for sep in [',', ';', '\t', '|']:
             try:
-                df = pd.read_csv(file, sep=sep)
+                df = pd.read_csv(file_path, sep=sep)
                 if df.shape[1] > 1:
                     break
             except Exception:
                 continue
         else:
-            raise ValueError("Could not determine the CSV separator.")
+            raise ValueError("No s'ha pogut detectar el separador del CSV.")
     else:
-        raise ValueError("Unsupported file format.")
+        raise ValueError("Format de fitxer no suportat.")
+
+    # Neteja bàsica
     df.columns = df.columns.str.strip()
     df = df.loc[:, df.columns.notna()]
     df = df.loc[:, df.columns != '']
     for col in df.select_dtypes(include=['object']):
         df[col] = df[col].str.strip()
+
     df.to_sql(table_name, conn, if_exists='replace', index=False)
+    conn.close()
+    return table_name
 
 def get_records_with_headers(cursor, table_name, n=5):
     cursor.execute(f"PRAGMA table_info({table_name})")
@@ -261,28 +203,32 @@ def prompt_important_columns(variables):
 
 # --- MAIN PIPELINE FLOW ---
 
-def prepare_sqlite_and_view(file, max_retries=10):
-    db_file = resource_path('data/base_sql.db')
+def prepare_sqlite_and_view(file, username, max_retries=10):
+    db_file = get_user_db_path(username)  # Asegurat que utilitzes el path correcte per la base de dades de l'usuari
     table_name = 'NEW_TABLE'
     conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
-    file = resource_path(file)
-    load_file_data_to_sqlite(conn, file, table_name)
+    
+    # Ara utilitzem la ruta del fitxer directament, passant el camí absolut o relatiu
+    file_path = file  # Si 'file' ja és una ruta del fitxer, no cal canviar-ho
+    
+    # Càrrega de fitxer a SQLite
+    table_name = load_user_file_to_sqlite(file_path, username)  # Utilitza la funció definida prèviament
 
-    # 1. Initial info for feature engineering
+    # 1. Informació inicial per a feature engineering
     reg_txt = get_records_with_headers(cursor, table_name)
     num_stats = get_numeric_statistics(cursor, table_name)
     cat_cat = get_categorical_catalog(cursor, table_name)
 
-    # 2. Feature engineering (new columns) with improved retries
+    # 2. Feature engineering (nous columns) amb millora de reintents
     attempts = 0
     last_error = ""
     while attempts < max_retries:
         if attempts == 0:
-            # Primer intento: prompt normal
+            # Primer intent: prompt normal
             ideas = prompt_new_column_ideas(reg_txt, num_stats, cat_cat)
         else:
-            # Nuevos intentos: incluye el error en el prompt para ayudar al LLM
+            # Nous intents: inclou l'error en el prompt per ajudar la IA
             error_message = f"\nNote: The previous SQL code failed with the following SQLite error: {last_error}. Please avoid using unsupported functions or syntax."
             ideas = prompt_new_column_ideas(reg_txt, num_stats, cat_cat) + error_message
 
@@ -290,23 +236,26 @@ def prepare_sqlite_and_view(file, max_retries=10):
         if not sql_statement_columns:
             print("No new columns generated, skipping this step.")
             break
+        
+        # Validació abans d'executar
         try:
             cursor.executescript(sql_statement_columns)
             conn.commit()
             print("Feature engineering executed successfully.")
-            break  # Success
+            break  # Exit si l'operació és exitosa
         except Exception as e:
             last_error = str(e)
             attempts += 1
             print(f"Error executing feature engineering SQL (attempt {attempts}/{max_retries}): {e}")
             if attempts >= max_retries:
                 print("Permanent failure executing feature engineering SQL after several attempts.")
-                break  # O raise, según tu preferencia
+                break  # O raise, segons la preferència
 
-    # Continúa el resto del pipeline igual...
+    # Continua el procés per aplicar altres operacions després...
     # ...
     conn.close()
     return db_file
+
 
 def handle_high_cardinality_categoricals(df, max_card=20, top_n=10):
     """Groups infrequent categories into 'Other' and excludes variables with excessive cardinality."""
@@ -323,7 +272,7 @@ def handle_high_cardinality_categoricals(df, max_card=20, top_n=10):
     return df_result, cols_to_use
 
 def read_clustering_data(db_file='data/base_sql.db'):
-    db_file = resource_path(db_file)  # ← Aquí
+    db_file = db_file  # ← Aquí
     conn = sqlite3.connect(db_file)
     try:
         try:
@@ -530,4 +479,4 @@ def full_clustering_flow(file, n_clusters=0):
     print(cluster_summary)
     return cluster_summary
 
-#full_clustering_flow(resource_path('data/travel_profiles.csv'), 0)
+full_clustering_flow('input/data_example/clients_variats.csv', 0)

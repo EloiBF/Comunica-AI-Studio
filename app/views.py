@@ -1,14 +1,25 @@
 from django.shortcuts import render, redirect
 from django.conf import settings
-import os
+import os,sys
+from pathlib import Path
 import json
+from django.http import JsonResponse
 from datetime import datetime
-from app.scripts.gen_html import generate_content_from_prompt, render_template
 from django.http import HttpResponse, Http404
 from mimetypes import guess_type
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+
+
+# Definim entorn on s'executarà aquest script (com si fos el root)
+base_dir = Path(__file__).resolve().parent.parent.parent  # Aquí, puja un nivell més alt per arribar a l'arrel
+sys.path.append(str(base_dir))
+
+from app.scripts.utils import get_user_folder_path
+from app.scripts.gen_clusters import load_user_file_to_sqlite
+from app.scripts.gen_html import generate_content_from_prompt, render_template
+
 
 # Landing page (pública)
 def landing(request):
@@ -166,3 +177,24 @@ def journey_builder(request):
 @login_required
 def profile(request):
     return render(request, 'profile.html')
+
+
+""" 
+@login_required
+def upload_user_file(request):
+    if request.method == 'POST' and request.FILES['file']:
+        user = request.user.username
+        uploaded_file = request.FILES['file']
+        
+        # Desa temporalment el fitxer
+        user_data_dir = get_user_folder_path(user, 'data')
+        saved_path = os.path.join(user_data_dir, uploaded_file.name)
+        with open(saved_path, 'wb+') as destination:
+            for chunk in uploaded_file.chunks():
+                destination.write(chunk)
+
+        try:
+            table = load_user_file_to_sqlite(saved_path, user)
+            return JsonResponse({'status': 'OK', 'table_created': table})
+        except Exception as e:
+            return JsonResponse({'status': 'ERROR', 'message': str(e)}) """

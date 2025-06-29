@@ -1,10 +1,128 @@
+
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Benvingut - Comunica AI{% endblock %}
+{% block title %}Benvingut - Comunica AI Studio{% endblock %}
+{% block description %}Crea comunicacions personalitzades amb intel·ligència artificial de forma fàcil i ràpida. Comença ara mateix amb Comunica AI Studio.{% endblock %}
 
 {% block content %}
-    <h1>Benvingut a Comunica AI Studio</h1>
-    <p>Crea comunicacions personalitzades amb IA de forma fàcil i ràpida.</p>
-    <a href="/signup/">Comença ara</a>
+<article class="landing-page">
+    <!-- Hero Section -->
+    <section class="hero-section" aria-labelledby="hero-title">
+        <div class="hero-content">
+            <h1 id="hero-title">
+                Crea comunicacions amb 
+                <span style="background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Intel·ligència Artificial</span>
+            </h1>
+            <p class="hero-description">
+                Transforma les teves idees en comunicacions professionals i personalitzades amb la nostra plataforma d'IA avançada. Ràpid, fàcil i efectiu.
+            </p>
+            <div class="hero-actions">
+                <a href="/signup/" class="btn btn-primary btn-lg" aria-describedby="signup-description">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M13 3l3.293 3.293-7 7 1.414 1.414 7-7L21 11V3z"/>
+                        <path d="M19 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"/>
+                    </svg>
+                    Comença ara gratuït
+                </a>
+                {% if not user.is_authenticated %}
+                    <a href="/login/" class="btn btn-secondary btn-lg">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                            <polyline points="10,17 15,12 10,7"/>
+                            <line x1="15" y1="12" x2="3" y2="12"/>
+                        </svg>
+                        Ja tinc compte
+                    </a>
+                {% endif %}
+            </div>
+            <p id="signup-description" class="sr-only">Registra't gratuïtament per començar a crear comunicacions amb IA</p>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" aria-labelledby="features-title">
+        <h2 id="features-title">Per què triar Comunica AI Studio?</h2>
+        <div class="features-grid">
+            <article class="feature-card">
+                <div class="feature-icon" style="background: linear-gradient(135deg, var(--primary-500), var(--primary-600)); width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                </div>
+                <h3>Generació intel·ligent</h3>
+                <p>Crea comunicacions personalitzades amb la nostra IA avançada que entén el teu context i objectius específics.</p>
+            </article>
+            
+            <article class="feature-card">
+                <div class="feature-icon" style="background: linear-gradient(135deg, var(--success-500), #059669); width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <rect x="7" y="7" width="3" height="9"/>
+                        <rect x="14" y="7" width="3" height="5"/>
+                    </svg>
+                </div>
+                <h3>Plantilles flexibles</h3>
+                <p>Accedeix a una biblioteca de plantilles professionals o crea les teves pròpies per adaptar-se a qualsevol necessitat.</p>
+            </article>
+            
+            <article class="feature-card">
+                <div class="feature-icon" style="background: linear-gradient(135deg, var(--warning-500), #d97706); width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="10,8 16,12 10,16 10,8"/>
+                    </svg>
+                </div>
+                <h3>Context personalitzat</h3>
+                <p>Defineix el teu context empresarial i sector per obtenir resultats més precisos i adaptats a la teva realitat.</p>
+            </article>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" style="background: linear-gradient(135deg, var(--gray-50) 0%, var(--primary-50) 100%); padding: var(--space-16) var(--space-8); border-radius: var(--radius-xl); text-align: center; margin-top: var(--space-12);">
+        <h2 style="font-size: var(--font-size-2xl); margin-bottom: var(--space-4); color: var(--gray-900);">
+            Preparat per revolucionar les teves comunicacions?
+        </h2>
+        <p style="font-size: var(--font-size-lg); color: var(--gray-600); margin-bottom: var(--space-8); max-width: 600px; margin-left: auto; margin-right: auto;">
+            Uneix-te a milers d'empreses que ja utilitzen la nostra plataforma per crear comunicacions més efectives.
+        </p>
+        <a href="/signup/" class="btn btn-primary btn-lg">
+            Comença la teva prova gratuïta
+        </a>
+    </section>
+</article>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Additional landing page specific styles */
+.landing-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-icon {
+    transition: transform var(--transition-normal);
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.05) rotate(2deg);
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: var(--space-12) var(--space-6);
+    }
+    
+    .features-section {
+        padding: var(--space-8) 0;
+    }
+    
+    .cta-section {
+        padding: var(--space-12) var(--space-6);
+        margin-top: var(--space-8);
+    }
+}
+</style>
 {% endblock %}

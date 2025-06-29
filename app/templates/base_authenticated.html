@@ -1,56 +1,205 @@
-{% load static %}
 
+{% load static %}
 <!DOCTYPE html>
-<html lang="ca">
+<html lang="ca" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Panell d'usuari{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block description %}Panell d'usuari - Comunica AI Studio{% endblock %}">
+    <title>{% block title %}Panell d'usuari - Comunica AI Studio{% endblock %}</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%230ea5e9'/><text x='50' y='60' font-family='Arial' font-size='40' font-weight='bold' text-anchor='middle' fill='white'>C</text></svg>">
 </head>
-<body>
-    <header>
-        <nav>
-            <a href="/">Inici</a>
-            {% if user.is_authenticated %}
-                <a href="/dashboard/">Panell</a>
-                <a href="/logout/">Tanca sessió</a>
-            {% else %}
-                <a href="/login/">Inicia sessió</a>
-                <a href="/signup/">Registra't</a>
-            {% endif %}
+<body class="authenticated-layout h-full">
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only">Salta al contingut principal</a>
+    
+    <!-- Header -->
+    <header class="site-header" role="banner">
+        <nav class="main-nav" role="navigation" aria-label="Navegació principal">
+            <div class="nav-brand">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Obrir/tancar menú de navegació">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                </button>
+                <a href="/dashboard/" aria-label="Comunica AI Studio - Panell d'usuari">
+                    Comunica AI Studio
+                </a>
+            </div>
+            <div class="nav-links">
+                <span class="user-greeting">Hola, {{ user.username|default:"Usuari" }}</span>
+                <a href="/dashboard/" class="btn btn-secondary">Panell</a>
+                <a href="/logout/" class="btn btn-secondary">Tanca sessió</a>
+            </div>
         </nav>
     </header>
 
-    <div class="wrapper">
-        <!-- Barra lateral -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2>Panell d'usuari</h2>
-                <p>Benvingut, {{ user.username }}</p>
+    <!-- App layout wrapper -->
+    <div class="app-layout" id="appLayout">
+        <!-- Sidebar overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar" role="complementary" aria-label="Navegació del panell">
+            <div class="sidebar-content">
+                <div class="sidebar-header">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            {{ user.username.0|upper|default:"U" }}
+                        </div>
+                        <div class="user-details">
+                            <h2>{{ user.username|default:"Usuari" }}</h2>
+                            <p>Administrador</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav class="sidebar-nav" role="navigation" aria-label="Navegació secundària">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="/dashboard/" 
+                               class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                               aria-current="{% if request.resolver_match.url_name == 'dashboard' %}page{% else %}false{% endif %}">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <rect x="3" y="3" width="7" height="7"/>
+                                    <rect x="14" y="3" width="7" height="7"/>
+                                    <rect x="14" y="14" width="7" height="7"/>
+                                    <rect x="3" y="14" width="7" height="7"/>
+                                </svg>
+                                <span class="nav-text">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/generate/" 
+                               class="nav-link {% if request.resolver_match.url_name == 'generate' %}active{% endif %}"
+                               aria-current="{% if request.resolver_match.url_name == 'generate' %}page{% else %}false{% endif %}">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                                    <polyline points="14,2 14,8 20,8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                </svg>
+                                <span class="nav-text">Generar Comunicació</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/clusters/" 
+                               class="nav-link {% if request.resolver_match.url_name == 'clusters' %}active{% endif %}"
+                               aria-current="{% if request.resolver_match.url_name == 'clusters' %}page{% else %}false{% endif %}">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+                                </svg>
+                                <span class="nav-text">Generar Clústers</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/context/" 
+                               class="nav-link {% if request.resolver_match.url_name == 'context' %}active{% endif %}"
+                               aria-current="{% if request.resolver_match.url_name == 'context' %}page{% else %}false{% endif %}">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span class="nav-text">El meu Context</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/journey/" 
+                               class="nav-link {% if request.resolver_match.url_name == 'journey' %}active{% endif %}"
+                               aria-current="{% if request.resolver_match.url_name == 'journey' %}page{% else %}false{% endif %}">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+                                </svg>
+                                <span class="nav-text">Journey Builder</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/profile/" 
+                               class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
+                               aria-current="{% if request.resolver_match.url_name == 'profile' %}page{% else %}false{% endif %}">
+                                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                                <span class="nav-text">El meu perfil</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li><a href="/dashboard/">Inici</a></li>
-                    <li><a href="/generate/">Generar Comunicació</a></li>
-                    <li><a href="/clusters/">Generar Clústers</a></li>
-                    <li><a href="/context/">El meu Context</a></li>
-                    <li><a href="/journey/">Journey Builder</a></li>
-                    <li><a href="/profile/">El meu perfil</a></li>
-                    <li><a href="{% url 'logout' %}">Tancar Sessió</a></li>
-                </ul>
-            </nav>
         </aside>
 
-        <!-- Contingut principal -->
-        <main class="content">
-            {% block content %}
-            <!-- Aquí es carregarà el contingut específic de cada pàgina -->
-            {% endblock %}
+        <!-- Main content area -->
+        <main class="main-content" id="main-content" role="main">
+            <div class="content-wrapper">
+                {% block content %}{% endblock %}
+            </div>
         </main>
     </div>
 
-    <footer>
-        <p>&copy; 2025 Comunica AI Studio</p>
+    <!-- Footer -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-content">
+            <p>&copy; 2025 Comunica AI Studio. Tots els drets reservats.</p>
+        </div>
     </footer>
+
+    <!-- Scripts -->
+    {% block extra_js %}{% endblock %}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const appLayout = document.getElementById('appLayout');
+            
+            // Toggle sidebar
+            function toggleSidebar() {
+                appLayout.classList.toggle('sidebar-open');
+                document.body.classList.toggle('sidebar-mobile-open');
+            }
+            
+            // Close sidebar
+            function closeSidebar() {
+                appLayout.classList.remove('sidebar-open');
+                document.body.classList.remove('sidebar-mobile-open');
+            }
+            
+            // Event listeners
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            sidebarOverlay.addEventListener('click', closeSidebar);
+            
+            // Close sidebar when clicking on navigation links on mobile
+            const navLinks = sidebar.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        closeSidebar();
+                    }
+                });
+            });
+            
+            // Handle resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    closeSidebar();
+                }
+            });
+            
+            // Add fade-in animation
+            document.querySelector('.app-layout').classList.add('fade-in');
+        });
+    </script>
 </body>
 </html>

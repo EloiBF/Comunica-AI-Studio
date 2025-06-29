@@ -3,7 +3,29 @@ import re
 import json
 from groq import Groq
 from dotenv import load_dotenv
-import os
+import os, sys
+from pathlib import Path
+
+# Definim entorn on s'executarà aquest script (com si fos el root)
+base_dir = Path(__file__).resolve().parent.parent.parent  # Aquí, puja un nivell més alt per arribar a l'arrel
+sys.path.append(str(base_dir))
+
+from django.conf import settings
+
+
+
+
+def get_user_folder_path(username, subfolder='data'):
+    base_path = os.path.join(settings.BASE_DIR, 'users', username, subfolder)
+    os.makedirs(base_path, exist_ok=True)
+    return base_path
+
+def get_user_db_path(username):
+    return os.path.join(get_user_folder_path(username, 'data'), 'user_database.db')
+
+def get_clean_table_name(file_path):
+    name = os.path.splitext(os.path.basename(file_path))[0]
+    return name.strip().replace(' ', '_').replace('-', '_').lower()
 
 def extract_json_from_text(text: str) -> dict:
     """
@@ -21,7 +43,6 @@ def extract_json_from_text(text: str) -> dict:
             continue  # Prova amb el següent match
 
     raise ValueError("No s'ha pogut extreure un bloc JSON vàlid del text.")
-
 
 def prompt_AI(prompt: str, model: str = "llama3-70b-8192") -> str:
     """

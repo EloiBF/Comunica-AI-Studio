@@ -1,13 +1,122 @@
+
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Inicia Sessió{% endblock %}
+{% block title %}Inicia Sessió - Comunica AI Studio{% endblock %}
+{% block description %}Accedeix al teu compte de Comunica AI Studio per continuar creant comunicacions amb intel·ligència artificial.{% endblock %}
 
 {% block content %}
-<h2>Inicia sessió</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Entrar</button>
-</form>
+<div style="max-width: 480px; margin: 0 auto; padding: var(--space-8) var(--space-6);">
+    <!-- Header -->
+    <header class="text-center mb-8">
+        <h1 style="font-size: var(--font-size-3xl); font-weight: 700; color: var(--gray-900); margin-bottom: var(--space-4);">
+            Benvingut de nou
+        </h1>
+        <p style="color: var(--gray-600); font-size: var(--font-size-lg);">
+            Inicia sessió per accedir al teu panell
+        </p>
+    </header>
+
+    <!-- Login form -->
+    <div class="card">
+        <div class="card-content">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                <!-- Username field -->
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">
+                        Nom d'usuari
+                    </label>
+                    <input 
+                        type="text" 
+                        name="{{ form.username.name }}" 
+                        id="{{ form.username.id_for_label }}"
+                        class="form-input {% if form.username.errors %}border-error-500{% endif %}"
+                        value="{{ form.username.value|default:'' }}"
+                        required
+                        autofocus
+                        autocomplete="username"
+                        aria-describedby="{% if form.username.errors %}username-error{% endif %}"
+                    >
+                    {% if form.username.errors %}
+                        <div id="username-error" class="text-error-500 text-sm mt-1">
+                            {{ form.username.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password field -->
+                <div class="form-group">
+                    <label for="{{ form.password.id_for_label }}" class="form-label">
+                        Contrasenya
+                    </label>
+                    <input 
+                        type="password" 
+                        name="{{ form.password.name }}" 
+                        id="{{ form.password.id_for_label }}"
+                        class="form-input {% if form.password.errors %}border-error-500{% endif %}"
+                        required
+                        autocomplete="current-password"
+                        aria-describedby="{% if form.password.errors %}password-error{% endif %}"
+                    >
+                    {% if form.password.errors %}
+                        <div id="password-error" class="text-error-500 text-sm mt-1">
+                            {{ form.password.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Submit button -->
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: var(--space-4);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: var(--space-2);">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                        <polyline points="10,17 15,12 10,7"/>
+                        <line x1="15" y1="12" x2="3" y2="12"/>
+                    </svg>
+                    Iniciar sessió
+                </button>
+
+                <!-- Form errors -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-error" style="background: var(--error-50); border: 1px solid var(--error-200); color: var(--error-700); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-4);">
+                        {{ form.non_field_errors.0 }}
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Sign up link -->
+    <div class="text-center mt-6">
+        <p style="color: var(--gray-600);">
+            Encara no tens compte? 
+            <a href="/signup/" style="color: var(--primary-600); text-decoration: none; font-weight: 500;">
+                Registra't aquí
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.border-error-500 {
+    border-color: var(--error-500) !important;
+}
+
+.text-error-500 {
+    color: var(--error-500);
+}
+
+.alert-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+}
+
+.form-input:focus.border-error-500 {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+</style>
 {% endblock %}

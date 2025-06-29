@@ -1,31 +1,71 @@
+
 {% load static %}
 <!DOCTYPE html>
-<html lang="ca">
+<html lang="ca" class="h-full">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block description %}Comunica AI Studio - Crea comunicacions personalitzades amb IA{% endblock %}">
     <title>{% block title %}Comunica AI Studio{% endblock %}</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%230ea5e9'/><text x='50' y='60' font-family='Arial' font-size='40' font-weight='bold' text-anchor='middle' fill='white'>C</text></svg>">
 </head>
-<body>
-    <header>
-        <nav>
-            <a href="/">Inici</a>
-            {% if user.is_authenticated %}
-                <a href="/dashboard/">Panell</a>
-                <a href="/logout/">Tanca sessió</a>
-            {% else %}
-                <a href="/login/">Inicia sessió</a>
-                <a href="/signup/">Registra't</a>
-            {% endif %}
+<body class="h-full">
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only">Salta al contingut principal</a>
+    
+    <!-- Header -->
+    <header class="site-header" role="banner">
+        <nav class="main-nav" role="navigation" aria-label="Navegació principal">
+            <div class="nav-brand">
+                <a href="/" aria-label="Comunica AI Studio - Pàgina d'inici">
+                    Comunica AI Studio
+                </a>
+            </div>
+            <div class="nav-links">
+                {% if user.is_authenticated %}
+                    <a href="/dashboard/" class="btn btn-secondary">Panell</a>
+                    <a href="/logout/" class="btn btn-secondary">Tanca sessió</a>
+                {% else %}
+                    <a href="/login/" class="btn btn-secondary">Inicia sessió</a>
+                    <a href="/signup/" class="btn btn-primary">Registra't</a>
+                {% endif %}
+            </div>
         </nav>
     </header>
 
-    <main>
+    <!-- Main content -->
+    <main id="main-content" class="main-content fade-in" role="main">
         {% block content %}{% endblock %}
     </main>
 
-    <footer>
-        <p>&copy; 2025 Comunica AI Studio</p>
+    <!-- Footer -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="text-center">
+            <p>&copy; 2025 Comunica AI Studio. Tots els drets reservats.</p>
+            <p class="text-sm mt-2 opacity-75">Creat amb tecnologia d'intel·ligència artificial</p>
+        </div>
     </footer>
+
+    <!-- Scripts -->
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Basic analytics/performance monitoring could go here -->
+    <script>
+        // Simple performance monitoring
+        window.addEventListener('load', function() {
+            // Add fade-in animation to main content
+            document.querySelector('.main-content').classList.add('fade-in');
+        });
+    </script>
 </body>
 </html>
