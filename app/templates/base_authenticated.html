@@ -1,0 +1,56 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Panell d'usuari{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/">Inici</a>
+            {% if user.is_authenticated %}
+                <a href="/dashboard/">Panell</a>
+                <a href="/logout/">Tanca sessió</a>
+            {% else %}
+                <a href="/login/">Inicia sessió</a>
+                <a href="/signup/">Registra't</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <div class="wrapper">
+        <!-- Barra lateral -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Panell d'usuari</h2>
+                <p>Benvingut, {{ user.username }}</p>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="/dashboard/">Inici</a></li>
+                    <li><a href="/generate/">Generar Comunicació</a></li>
+                    <li><a href="/clusters/">Generar Clústers</a></li>
+                    <li><a href="/context/">El meu Context</a></li>
+                    <li><a href="/journey/">Journey Builder</a></li>
+                    <li><a href="/profile/">El meu perfil</a></li>
+                    <li><a href="{% url 'logout' %}">Tancar Sessió</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Contingut principal -->
+        <main class="content">
+            {% block content %}
+            <!-- Aquí es carregarà el contingut específic de cada pàgina -->
+            {% endblock %}
+        </main>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Comunica AI Studio</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,52 @@
+{% extends "base_authenticated.html" %}
+{% block title %}El meu context{% endblock %}
+
+{% block content %}
+<h1>El meu Context</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="context-block">
+        <label for="title_1">Nom del context 1</label>
+        <input type="text" id="title_1" name="title_1">
+
+        <label for="content_1">Context 1</label>
+        <textarea id="content_1" name="content_1" rows="4"></textarea>
+    </div>
+
+    <div class="context-block">
+        <label for="title_2">Nom del context 2</label>
+        <input type="text" id="title_2" name="title_2">
+
+        <label for="content_2">Context 2</label>
+        <textarea id="content_2" name="content_2" rows="4"></textarea>
+    </div>
+
+    <div class="context-block">
+        <label for="title_3">Nom del context 3</label>
+        <input type="text" id="title_3" name="title_3">
+
+        <label for="content_3">Context 3</label>
+        <textarea id="content_3" name="content_3" rows="4"></textarea>
+    </div>
+
+    <div class="context-block">
+        <label for="title_4">Nom del context 4</label>
+        <input type="text" id="title_4" name="title_4">
+
+        <label for="content_4">Context 4</label>
+        <textarea id="content_4" name="content_4" rows="4"></textarea>
+    </div>
+
+    <div class="context-block">
+        <label for="title_5">Nom del context 5</label>
+        <input type="text" id="title_5" name="title_5">
+
+        <label for="content_5">Context 5</label>
+        <textarea id="content_5" name="content_5" rows="4"></textarea>
+    </div>
+
+    <button type="submit">Desar</button>
+</form>
+{% endblock %}

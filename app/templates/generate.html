@@ -1,0 +1,75 @@
+{% extends 'base_authenticated.html' %}
+
+{% block title %}Generador de Comunicacions{% endblock %}
+
+{% block content %}
+    <h2>Benvingut, {{ user.username }}</h2>
+    <p>Aquí pots crear i gestionar les teves comunicacions personalitzades.</p>
+
+    <div class="container">
+        <header>
+            <h1>Generador de Comunicacions</h1>
+            <p>Genera comunicacions professionals de manera ràpida i senzilla, personalitzant-les a partir de prompts i plantilles.</p>
+        </header>
+
+        <!-- Formulari de generació de comunicacions -->
+        <section class="form-container">
+            <form method="POST">
+                {% csrf_token %}
+                <label for="name">Nom de la comunicació:</label>
+                <input type="text" name="name" required>
+
+                <label for="prompt">Prompt:</label>
+                <textarea name="prompt" required></textarea>
+
+                <label for="template">Plantilla:</label>
+                <select name="template" required>
+                    <option value="sale.html">Sale Template</option>
+                    <option value="tips.html">Tips Template</option>
+                </select>
+
+                <button type="submit">Generar Comunicació</button>
+            </form>
+        </section>
+
+        <!-- Taula de comunicacions generades -->
+        <section class="table-container">
+            <h2>Comunicacions Generades</h2>
+            {% if generated_metadata %}
+                <table class="responsive-table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prompt</th>
+                            <th>Plantilla</th>
+                            <th>Data de Creació</th>
+                            <th>Enllaç</th>
+                            <th>Accions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for meta in generated_metadata %}
+                        <tr>
+                            <td>{{ meta.name }}</td>
+                            <td>{{ meta.prompt }}</td>
+                            <td>{{ meta.template }}</td>
+                            <td>{{ meta.created_at }}</td>
+                            <td><a href="/generated/{{ meta.filename }}" target="_blank" class="view-link">Veure</a></td>
+                            <td>
+                                <form method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="filename" value="{{ meta.filename }}">
+                                    <button type="submit" class="delete-button">🗑️</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="no-files">No s'han generat comunicacions encara.</p>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}
