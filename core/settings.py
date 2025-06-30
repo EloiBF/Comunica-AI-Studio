@@ -17,17 +17,27 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 print("BASE_DIR:", BASE_DIR)
 
-# Ruta de les plantilles HTML
+# Ruta de les plantilles HTML (global)
 TEMPLATE_DIR = BASE_DIR / 'app' / 'input' / 'templates'
 
-# Ruta de les imatges
+# Ruta de les imatges (global)
 IMAGES_DIR = BASE_DIR / 'app' / 'input' / 'images'
 
-# Ruta del fitxer JSON d'imatges
+# Ruta del fitxer JSON d'imatges (global)
 IMAGES_JSON = BASE_DIR / 'app' / 'input' / 'images.json'
 
-# Ruta de sortida per a HTML generat
-HTML_OUTPUT = BASE_DIR / 'app' / 'output'
+# Funcions per rutes dinàmiques d'usuari
+def get_user_html_dir(username):
+    """Retorna la carpeta HTML de l'usuari"""
+    return BASE_DIR / 'app' / 'users' / username / 'htmls'
+
+def get_user_clusters_dir(username):
+    """Retorna la carpeta de clusters de l'usuari"""
+    return BASE_DIR / 'app' / 'users' / username / 'clusters'
+
+def get_user_data_dir(username):
+    """Retorna la carpeta de dades de l'usuari"""
+    return BASE_DIR / 'app' / 'users' / username / 'data_files'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/

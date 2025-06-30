@@ -1,4 +1,3 @@
-
 {% extends 'base_authenticated.html' %}
 
 {% block title %}Generador de Comunicacions{% endblock %}
@@ -7,10 +6,10 @@
 <div class="generate-page">
     <!-- Page header -->
     <header class="page-header mb-8">
-        <h1 style="font-size: var(--font-size-3xl); font-weight: 700; color: var(--gray-900); margin-bottom: var(--space-2);">
+        <h1 class="page-title">
             Generador de Comunicacions
         </h1>
-        <p style="font-size: var(--font-size-lg); color: var(--gray-600);">
+        <p class="page-subtitle">
             Genera comunicacions professionals de manera ràpida i senzilla, personalitzant-les a partir de prompts i plantilles
         </p>
     </header>
@@ -19,17 +18,17 @@
     <section class="form-section mb-12" aria-labelledby="form-title">
         <div class="card">
             <div class="card-header">
-                <h2 id="form-title" style="font-size: var(--font-size-xl); font-weight: 600; color: var(--gray-900); margin: 0;">
+                <h2 id="form-title" class="card-title">
                     Nova Comunicació
                 </h2>
             </div>
             <div class="card-content">
                 <form method="POST" class="generate-form">
                     {% csrf_token %}
-                    
+
                     <div class="form-group">
-                        <label for="name" class="form-label">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; margin-right: var(--space-2);">
+                        <label for="name" class="form-label form-label-with-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="form-label-icon">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
                                 <polyline points="14,2 14,8 20,8"/>
                             </svg>
@@ -40,8 +39,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="prompt" class="form-label">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; margin-right: var(--space-2);">
+                        <label for="prompt" class="form-label form-label-with-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="form-label-icon">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                             </svg>
                             Prompt
@@ -51,8 +50,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="template" class="form-label">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; margin-right: var(--space-2);">
+                        <label for="template" class="form-label form-label-with-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="form-label-icon">
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                                 <line x1="9" y1="9" x2="15" y2="9"/>
                                 <line x1="9" y1="13" x2="15" y2="13"/>
@@ -67,7 +66,24 @@
                         </select>
                     </div>
 
-                    <div class="form-actions" style="display: flex; gap: var(--space-4); justify-content: flex-end; margin-top: var(--space-6);">
+                    <div class="form-group">
+                        <label for="dataset" class="form-label">Dataset (opcional)</label>
+                        <select name="dataset" id="dataset" class="form-select">
+                            <option value="">-- Sense segmentació --</option>
+                            {% for dataset in available_datasets %}
+                                <option value="{{ dataset.name }}">{{ dataset.name|title }} ({{ dataset.num_clusters }} clusters)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cluster" class="form-label">Cluster (opcional)</label>
+                        <select name="cluster" id="cluster" class="form-select" disabled>
+                            <option value="">-- Selecciona primer un dataset --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions form-actions-end">
                         <button type="reset" class="btn btn-secondary">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M3 6h18l-1.5 12a2 2 0 0 1-2 1.84H6.5a2 2 0 0 1-2-1.84L3 6ZM8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -90,10 +106,10 @@
     </section>
 
     <!-- Communications Table -->
-    <section class="communications-section" aria-labelledby="communications-title" style="margin-top: 2rem;">
+    <section class="communications-section" aria-labelledby="communications-title">
         <div class="card">
             <div class="card-header">
-                <h2 id="communications-title" style="font-size: var(--font-size-xl); font-weight: 600; color: var(--gray-900); margin: 0;">
+                <h2 id="communications-title" class="card-title">
                     Comunicacions Generades
                 </h2>
             </div>
@@ -106,6 +122,8 @@
                                     <th>Nom</th>
                                     <th>Prompt</th>
                                     <th>Plantilla</th>
+                                    <th>Dataset</th>
+                                    <th>Cluster</th>
                                     <th>Data de Creació</th>
                                     <th>Accions</th>
                                 </tr>
@@ -114,12 +132,12 @@
                                 {% for meta in generated_metadata %}
                                 <tr>
                                     <td>
-                                        <div style="font-weight: 600; color: var(--gray-900); margin-bottom: var(--space-1);">
+                                        <div class="table-cell-primary">
                                             {{ meta.name }}
                                         </div>
                                     </td>
                                     <td>
-                                        <div style="color: var(--gray-600); font-size: var(--font-size-sm); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ meta.prompt }}">
+                                        <div class="table-cell-prompt" title="{{ meta.prompt }}">
                                             {{ meta.prompt }}
                                         </div>
                                     </td>
@@ -129,12 +147,26 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <time style="color: var(--gray-600); font-size: var(--font-size-sm);">
+                                        {% if meta.dataset %}
+                                            <span class="badge badge-secondary">{{ meta.dataset|title }}</span>
+                                        {% else %}
+                                            <span class="text-gray-500">Sense dataset</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if meta.cluster %}
+                                            <span class="badge badge-primary">{{ meta.cluster }}</span>
+                                        {% else %}
+                                            <span class="text-gray-500">Tots</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <time class="table-cell-date">
                                             {{ meta.created_at|date:"d/m/Y H:i" }}
                                         </time>
                                     </td>
                                     <td>
-                                        <div class="action-buttons" style="display: flex; gap: var(--space-2);">
+                                        <div class="action-buttons">
                                             <a href="/generated/{{ meta.filename }}" target="_blank" class="btn-icon btn-icon-primary" title="Veure comunicació">
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -163,8 +195,8 @@
                         </table>
                     </div>
                 {% else %}
-                    <div class="empty-state" style="text-align: center; padding: var(--space-12) var(--space-6);">
-                        <div style="background: var(--gray-100); width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-6);">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
                             <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--gray-400)">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
                                 <polyline points="14,2 14,8 20,8"/>
@@ -172,10 +204,10 @@
                                 <line x1="16" y1="17" x2="8" y2="17"/>
                             </svg>
                         </div>
-                        <h3 style="color: var(--gray-700); margin-bottom: var(--space-2); font-size: var(--font-size-lg);">
+                        <h3 class="empty-state-title">
                             Encara no tens comunicacions generades
                         </h3>
-                        <p style="color: var(--gray-500); margin-bottom: var(--space-6);">
+                        <p class="empty-state-text">
                             Utilitza el formulari de dalt per crear la teva primera comunicació amb IA
                         </p>
                     </div>
@@ -184,4 +216,47 @@
         </div>
     </section>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const datasetSelect = document.getElementById('dataset');
+    const clusterSelect = document.getElementById('cluster');
+
+    // Dades dels clusters per dataset
+    const datasetsData = {
+        {% for dataset in available_datasets %}
+        '{{ dataset.name }}': {
+            {% if dataset.descriptions %}
+                {% for cluster_key, cluster_desc in dataset.descriptions.items %}
+                    '{{ cluster_key }}': '{{ cluster_desc.name|default:"Cluster"|escapejs }}',
+                {% endfor %}
+            {% endif %}
+        },
+        {% endfor %}
+    };
+
+    datasetSelect.addEventListener('change', function() {
+        const selectedDataset = this.value;
+        clusterSelect.innerHTML = '';
+
+        if (selectedDataset === '') {
+            clusterSelect.disabled = true;
+            clusterSelect.innerHTML = '<option value="">-- Selecciona primer un dataset --</option>';
+            return;
+        }
+
+        clusterSelect.disabled = false;
+        clusterSelect.innerHTML = '<option value="">-- Tots els clusters --</option>';
+
+        const clusters = datasetsData[selectedDataset] || {};
+        for (const [clusterId, clusterName] of Object.entries(clusters)) {
+            const option = document.createElement('option');
+            option.value = clusterId;
+            option.textContent = clusterName;
+            clusterSelect.appendChild(option);
+        }
+    });
+});
+</script>
+
 {% endblock %}

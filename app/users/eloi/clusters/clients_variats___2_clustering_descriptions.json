@@ -1,0 +1,17 @@
+{
+  "cluster_0": {
+    "name": "Sector diversificat",
+    "description": "El cluster 0 està format per clients del sector automoció, retail, educació i turisme, amb una presència significativa en cada un d'aquests sectors. Aquests clients tendeixen a ser heterogenis i amb una gran varietat de necessitats.",
+    "recommendations": "Reforçar la presència en els diferents sectors, oferint solucions personalitzades per a cada un d'ells."
+  },
+  "cluster_1": {
+    "name": "Salut i benestar",
+    "description": "El cluster 1 està format per clients del sector salut, amb un percentatge del 100% que pertanyen a aquest sector. Aquests clients tendeixen a ser molt sensibles a les qüestions de benestar i salut.",
+    "recommendations": "Desenvolupar estratègies d'atenció personalitzada i centrades en el benestar per a aquests clients."
+  },
+  "cluster_2": {
+    "name": "Tecnologia avançada",
+    "description": "El cluster 2 està format per clients del sector tecnologia, amb un percentatge del 100% que pertanyen a aquest sector. Aquests clients tendeixen a ser molt avançats en tecnologia i amb una gran necessitat de solucions especialitzades.",
+    "recommendations": "Desenvolupar solucions tecnològiques especialitzades i innovadores per a aquests clients."
+  }
+}

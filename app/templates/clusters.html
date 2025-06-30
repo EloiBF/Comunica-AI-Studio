@@ -1,7 +1,209 @@
 {# clusters.html #}
 {% extends 'base_authenticated.html' %}
+{% load static %}
+{% load dict_filters %}
 {% block title %}Clusters{% endblock %}
 {% block content %}
-<h1>Gestiona els teus clusters</h1>
-<!-- Formulari per pujar fitxer i llista de fitxers -->
+    <div class="page-header">
+        <h1 class="text-black">Gestiona els teus clusters</h1>
+        <p class="text-black opacity-75">Puja un fitxer de dades per generar segments de clients amb intel·ligència artificial</p>
+    </div>
+
+    <!-- Formulari per pujar fitxer -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Generar nous clusters</h2>
+        </div>
+        <div class="card-content">
+            <form method="post" enctype="multipart/form-data" class="form-grid">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="file" class="form-label">Fitxer de dades</label>
+                    <input type="file" name="file" id="file" class="form-input" accept=".csv,.xlsx,.xls" required>
+                    <div class="form-help">Formats acceptats: CSV, Excel (.xlsx, .xls)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="n_clusters" class="form-label">Nombre de clusters</label>
+                    <select name="n_clusters" id="n_clusters" class="form-input">
+                        <option value="0">Auto (recomanat)</option>
+                        <option value="2">2 clusters</option>
+                        <option value="3">3 clusters</option>
+                        <option value="4">4 clusters</option>
+                        <option value="5">5 clusters</option>
+                        <option value="6">6 clusters</option>
+                    </select>
+                    <div class="form-help">Selecciona "Auto" per que l'algoritme determini el nombre òptim</div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        Generar Clusters
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Gestió de datasets -->
+    {% if available_datasets %}
+    <div class="card">
+        <div class="card-header">
+            <h2>Datasets disponibles</h2>
+            <p class="text-gray-600">Gestiona fins a {{ max_datasets }} conjunts de clusters simultàniament</p>
+        </div>
+        <div class="card-content">
+            <div class="datasets-tabs">
+                {% for dataset in available_datasets %}
+                <div class="dataset-tab {% if dataset.name == selected_dataset %}active{% endif %}">
+                    <a href="?dataset={{ dataset.name }}" class="dataset-link">
+                        <div class="dataset-info">
+                            <h3>{{ dataset.name|title }}</h3>
+                            <p>{{ dataset.num_clusters }} clusters</p>
+                        </div>
+                    </a>
+                    <form method="post" class="dataset-actions" onsubmit="return confirm('Estàs segur que vols eliminar aquest dataset?')">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_dataset" value="{{ dataset.name }}">
+                        <button type="submit" class="btn-icon btn-icon-danger" title="Eliminar dataset">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+                {% endfor %}
+                
+                {% if available_datasets|length < max_datasets %}
+                <div class="dataset-slot-empty">
+                    <div class="empty-slot">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="text-gray-400">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        <p class="text-gray-500">Slot disponible</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Resultats dels clusters del dataset seleccionat -->
+    {% if selected_data and selected_data.data and selected_data.descriptions %}
+    <div class="card">
+        <div class="card-header">
+            <h2>Clusters de "{{ selected_dataset|title }}"</h2>
+            <p class="text-gray-600">Segments de clients identificats automàticament</p>
+        </div>
+        <div class="card-content">
+            <div class="clusters-grid">
+                {% for cluster_key, cluster_desc in selected_data.descriptions.items %}
+                    {% with cluster_id=cluster_key|extract_cluster_id %}
+                        {% with cluster_data=selected_data.data|get_item:cluster_key %}
+                            <div class="cluster-card">
+                                <div class="cluster-header">
+                                    <div class="cluster-badge">
+                                        Cluster {{ cluster_data.cluster_id|default:cluster_id }}
+                                    </div>
+                                    <div class="cluster-size">
+                                        {{ cluster_data.percentage|default:"0" }}% dels clients
+                                    </div>
+                                </div>
+                                
+                                <h3 class="cluster-name">{{ cluster_desc.name|default:"Sense nom" }}</h3>
+                                <p class="cluster-description">{{ cluster_desc.description|default:"Sense descripció" }}</p>
+                                
+                                <div class="cluster-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Clients:</span>
+                                        <span class="stat-value">{{ cluster_data.size|default:"N/A" }}</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Percentatge:</span>
+                                        <span class="stat-value">{{ cluster_data.percentage|default:"N/A" }}%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Variables numèriques -->
+                                {% if cluster_data.numeric_features %}
+                                <div class="cluster-features">
+                                    <h4 class="features-title">Variables numèriques destacades</h4>
+                                    <div class="features-grid">
+                                        {% for feature_name, feature_data in cluster_data.numeric_features.items %}
+                                            <div class="feature-item">
+                                                <span class="feature-name">{{ feature_name }}</span>
+                                                <div class="feature-values">
+                                                    <span class="feature-cluster">{{ feature_data.cluster_mean }}</span>
+                                                    <span class="feature-diff {% if feature_data.difference > 0 %}positive{% else %}negative{% endif %}">
+                                                        {% if feature_data.difference > 0 %}+{% endif %}{{ feature_data.difference }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Variables categòriques -->
+                                {% if cluster_data.categorical_features %}
+                                <div class="cluster-features">
+                                    <h4 class="features-title">Variables categòriques destacades</h4>
+                                    <div class="categorical-features">
+                                        {% for feature_name, categories in cluster_data.categorical_features.items %}
+                                            <div class="categorical-feature">
+                                                <span class="feature-name">{{ feature_name }}</span>
+                                                <div class="categories-list">
+                                                    {% for category, cat_data in categories.items %}
+                                                        <div class="category-item">
+                                                            <span class="category-name">{{ category }}</span>
+                                                            <span class="category-percentage">{{ cat_data.cluster_pct }}%</span>
+                                                            <span class="category-diff {% if cat_data.difference > 0 %}positive{% else %}negative{% endif %}">
+                                                                {% if cat_data.difference > 0 %}+{% endif %}{{ cat_data.difference }}%
+                                                            </span>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Recomanacions -->
+                                {% if cluster_desc.recommendations %}
+                                <div class="cluster-recommendations">
+                                    <h4 class="recommendations-title">Recomanacions</h4>
+                                    <p class="recommendations-text">{{ cluster_desc.recommendations }}</p>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="cluster-actions">
+                                    <a href="{% url 'cluster_communications' cluster_data.cluster_id|default:cluster_id %}" class="btn btn-secondary">
+                                        Crear Comunicació
+                                    </a>
+                                </div>
+                            </div>
+                        {% endwith %}
+                    {% endwith %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% elif selected_data and selected_data.data %}
+    <div class="card">
+        <div class="card-header">
+            <h2>Clusters detectats</h2>
+            <p class="text-gray-600">Generant descripcions...</p>
+        </div>
+        <div class="card-content">
+            <div class="alert alert-info">
+                S'han detectat {{ selected_data.data|length }} clusters. Les descripcions s'estan generant...
+            </div>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}

@@ -4,14 +4,8 @@
 
 {% block content %}
 <!-- Header -->
-    <header style="margin-bottom: var(--space-8);">
+    <div class="page-header mb-8">
         <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4);">
-            <div style="background: linear-gradient(135deg, var(--warning-500), var(--warning-600)); width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polygon points="10,8 16,12 10,16 10,8"/>
-                </svg>
-            </div>
             <div>
                 <h1 style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--gray-900); margin: 0;">
                     El meu Context
@@ -40,7 +34,7 @@
                 </div>
             </div>
         </div>
-    </header>
+    </div>
 
     <!-- Context form -->
     <form method="post" style="max-width: 800px;">

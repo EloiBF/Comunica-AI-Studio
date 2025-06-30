@@ -17,7 +17,6 @@ base_dir = Path(__file__).resolve().parent.parent.parent  # Aquí, puja un nivel
 sys.path.append(str(base_dir))
 
 from app.scripts.utils import get_user_folder_path
-from app.scripts.gen_clusters import load_user_file_to_sqlite
 from app.scripts.gen_html import generate_content_from_prompt, render_template
 
 
@@ -54,9 +53,11 @@ def logout_view(request):
     return redirect('landing')  # Redirige a la página de inicio o donde desees
 
 #  Serveix els fitxers generats
+@login_required
 def generated_file(request, filename):
-    HTML_OUTPUT = settings.HTML_OUTPUT
-    file_path = os.path.join(HTML_OUTPUT, filename)
+    # Usar carpeta HTML específica per l'usuari
+    user_htmls_folder = get_user_folder_path(request.user.username, 'htmls')
+    file_path = os.path.join(user_htmls_folder, filename)
 
     if not os.path.exists(file_path):
         raise Http404("Fitxer no trobat")
@@ -79,7 +80,37 @@ def context_view(request):
 @login_required
 def generate(request):
     TEMPLATE_DIR = settings.TEMPLATE_DIR
-    HTML_OUTPUT = settings.HTML_OUTPUT
+
+    # Usar carpeta HTML específica per l'usuari
+    user_htmls_folder = get_user_folder_path(request.user.username, 'htmls')
+    HTML_OUTPUT = user_htmls_folder
+    os.makedirs(HTML_OUTPUT, exist_ok=True)
+
+    # Obtenir datasets de clusters de l'usuari des de la nova ubicació
+    clusters_folder = get_user_folder_path(request.user.username, 'clusters')
+    clustering_files = [f for f in os.listdir(clusters_folder) if f.endswith('_clustering_summary.json')] if os.path.exists(clusters_folder) else []
+    available_datasets = []
+
+    for file_name in clustering_files:
+        table_name = file_name.replace('_clustering_summary.json', '')
+
+        # Carregar descripcions si existeixen
+        clusters_desc_path = os.path.join(str(clusters_folder), f'{table_name}_clustering_descriptions.json')
+        clusters_descriptions = None
+        if os.path.exists(clusters_desc_path):
+            with open(clusters_desc_path, 'r', encoding='utf-8') as f:
+                clusters_descriptions = json.load(f)
+
+        # Carregar dades del clustering
+        clusters_summary_path = os.path.join(str(clusters_folder), file_name)
+        with open(clusters_summary_path, 'r', encoding='utf-8') as f:
+            clusters_data = json.load(f)
+
+        available_datasets.append({
+            'name': table_name,
+            'descriptions': clusters_descriptions,
+            'num_clusters': len(clusters_data)
+        })
 
     # Si és POST i vol eliminar
     if request.method == "POST" and request.POST.get("action") == "delete":
@@ -101,6 +132,8 @@ def generate(request):
         communication_name = request.POST.get("name")
         prompt = request.POST.get("prompt")
         template_name = request.POST.get("template")
+        dataset_name = request.POST.get("dataset", "")
+        cluster_id = request.POST.get("cluster", "")
 
         generated_data = generate_content_from_prompt(prompt, template_name)
 
@@ -127,6 +160,8 @@ def generate(request):
                 "name": communication_name,
                 "prompt": prompt,
                 "template": template_name,
+                "dataset": dataset_name if dataset_name else None,
+                "cluster": cluster_id if cluster_id else None,
                 "created_at": datetime.now().isoformat()
             }
             with open(json_path, 'w', encoding='utf-8') as f:
@@ -159,12 +194,129 @@ def generate(request):
     return render(request, 'generate.html', {
         'generated_content': None,
         'generated_html_files': generated_html_files,
-        'generated_metadata': generated_metadata
+        'generated_metadata': generated_metadata,
+        'available_datasets': available_datasets
     })
 
 @login_required
 def clusters(request):
-    return render(request, 'clusters.html')
+    from app.scripts.gen_clusters import full_clustering_pipeline
+    from app.scripts.gen_clusters_desc import generar_descripcions_clusters
+
+    user_folder = get_user_folder_path(request.user.username)
+
+    message = None
+    selected_dataset = request.GET.get('dataset', None)
+
+    if request.method == 'POST':
+        if 'file' in request.FILES:
+            uploaded_file = request.FILES['file']
+            n_clusters = int(request.POST.get('n_clusters', 0))
+
+            # Guardar fitxer temporalment
+            user_data_dir = os.path.join(user_folder, 'data_files')
+            os.makedirs(user_data_dir, exist_ok=True)
+            file_path = os.path.join(user_data_dir, uploaded_file.name)
+
+            with open(file_path, 'wb+') as destination:
+                for chunk in uploaded_file.chunks():
+                    destination.write(chunk)
+
+            try:
+                # Generar clusters amb nou pipeline
+                cluster_summary, json_path = full_clustering_pipeline(file_path, request.user.username, n_clusters)
+
+                # Extreure nom de taula del path del JSON
+                json_filename = os.path.basename(json_path)
+                table_name = json_filename.replace('_clustering_summary.json', '')
+
+                # Generar descripcions
+                clusters_descriptions = generar_descripcions_clusters(request.user.username, table_name)
+
+                message = "✅ Clusters generats correctament!"
+                selected_dataset = table_name
+
+            except Exception as e:
+                print(f"Error generant clusters: {str(e)}")  # Log per debug
+                message = "❌ Error processant el fitxer. Si us plau, revisa el format i torna-ho a intentar."
+
+        elif request.POST.get('delete_dataset'):
+            dataset_to_delete = request.POST.get('delete_dataset')
+            try:
+                # Eliminar fitxers relacionats amb aquest dataset
+                files_to_delete = [
+                    f'{dataset_to_delete}_clustering_summary.json',
+                    f'{dataset_to_delete}_clustering_descriptions.json'
+                ]
+
+                for file_name in files_to_delete:
+                    file_path = os.path.join(user_folder, file_name)
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
+
+                message = f"✅ Dataset '{dataset_to_delete}' eliminat correctament!"
+
+                # Si estem visualitzant el dataset eliminat, netegem la selecció
+                if selected_dataset == dataset_to_delete:
+                    selected_dataset = None
+
+            except Exception as e:
+                print(f"Error eliminant dataset: {str(e)}")  # Log per debug
+                message = "❌ Error eliminant el dataset. Si us plau, torna-ho a intentar."
+
+    # Obtenir tots els datasets disponibles (màxim 3) des de la carpeta clusters
+    clusters_folder = get_user_folder_path(request.user.username, 'clusters')
+    clustering_files = [f for f in os.listdir(clusters_folder) if f.endswith('_clustering_summary.json')] if os.path.exists(clusters_folder) else []
+    available_datasets = []
+
+    for file_name in clustering_files:
+        table_name = file_name.replace('_clustering_summary.json', '')
+        clusters_summary_path = os.path.join(str(clusters_folder), file_name)
+
+        # Obtenir data de modificació
+        mod_time = os.path.getmtime(clusters_summary_path)
+
+        # Carregar dades del dataset
+        with open(clusters_summary_path, 'r', encoding='utf-8') as f:
+            clusters_data = json.load(f)
+
+        # Carregar descripcions si existeixen
+        clusters_desc_path = os.path.join(str(clusters_folder), f'{table_name}_clustering_descriptions.json')
+        clusters_descriptions = None
+        if os.path.exists(clusters_desc_path):
+            with open(clusters_desc_path, 'r', encoding='utf-8') as f:
+                clusters_descriptions = json.load(f)
+
+        available_datasets.append({
+            'name': table_name,
+            'data': clusters_data,
+            'descriptions': clusters_descriptions,
+            'modified_time': mod_time,
+            'num_clusters': len(clusters_data)
+        })
+
+    # Ordenar per data de modificació (més recent primer) i limitar a 3
+    available_datasets.sort(key=lambda x: x['modified_time'], reverse=True)
+    available_datasets = available_datasets[:3]
+
+    # Si no hi ha dataset seleccionat, seleccionar el més recent
+    if not selected_dataset and available_datasets:
+        selected_dataset = available_datasets[0]['name']
+
+    # Obtenir dades del dataset seleccionat
+    selected_data = None
+    for dataset in available_datasets:
+        if dataset['name'] == selected_dataset:
+            selected_data = dataset
+            break
+
+    return render(request, 'clusters.html', {
+        'available_datasets': available_datasets,
+        'selected_dataset': selected_dataset,
+        'selected_data': selected_data,
+        'message': message,
+        'max_datasets': 3
+    })
 
 @login_required
 def cluster_communications(request, cluster_id):
@@ -177,24 +329,3 @@ def journey_builder(request):
 @login_required
 def profile(request):
     return render(request, 'profile.html')
-
-
-""" 
-@login_required
-def upload_user_file(request):
-    if request.method == 'POST' and request.FILES['file']:
-        user = request.user.username
-        uploaded_file = request.FILES['file']
-        
-        # Desa temporalment el fitxer
-        user_data_dir = get_user_folder_path(user, 'data')
-        saved_path = os.path.join(user_data_dir, uploaded_file.name)
-        with open(saved_path, 'wb+') as destination:
-            for chunk in uploaded_file.chunks():
-                destination.write(chunk)
-
-        try:
-            table = load_user_file_to_sqlite(saved_path, user)
-            return JsonResponse({'status': 'OK', 'table_created': table})
-        except Exception as e:
-            return JsonResponse({'status': 'ERROR', 'message': str(e)}) """

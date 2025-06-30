@@ -1,0 +1,17 @@
+{
+  "cluster_0": {
+    "name": "Estat Català",
+    "description": "Aquest segment està format per clients que viuen en el territori històric de Catalunya, amb un codi postal mitjà molt més alt que el global.",
+    "recommendations": "Desenvolupar campanyes publicitàries en català i tenir en compte les preferències culturals locals."
+  },
+  "cluster_1": {
+    "name": "Sector Automòbil",
+    "description": "Aquest segment està format per clients que viuen en zones urbans i treballen en el sector de l'automòbil, amb un codi postal molt similar al global.",
+    "recommendations": "Ofereix serveis especialitzats en lloguer de vehicles per a empreses del sector automòbil i desenvolupar relacions comercials amb els clients freqüents."
+  },
+  "cluster_2": {
+    "name": "Estat Valencià",
+    "description": "Aquest segment està format per clients que viuen en el País Valencià, amb un codi postal mitjà molt més baix que el global.",
+    "recommendations": "Desenvolupar estratègies de marketing que valorin les pròpies tradicions i costums valencians, i oferir serveis especialitzats per a empreses locals."
+  }
+}

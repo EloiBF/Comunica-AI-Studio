@@ -1,70 +1,44 @@
+# Applying the requested changes to use centralized route functions from settings in the save_clustering_summary function.
 import os, sys
 import pandas as pd
 import numpy as np
 import sqlite3
-import requests
 import json
 import re
-import functools
-import time
-from dotenv import load_dotenv
+from pathlib import Path
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import RobustScaler
 from kneed import KneeLocator
-import groq  
 from sklearn.metrics import silhouette_score
-import json
-from pathlib import Path
 
 # Definim entorn on s'executarà aquest script (com si fos el root)
-base_dir = Path(__file__).resolve().parent.parent.parent  # Aquí, puja un nivell més alt per arribar a l'arrel
+base_dir = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(base_dir))
 
 # Importem funcions necessàries
 from app.scripts.utils import prompt_AI, get_clean_table_name, get_user_db_path, get_user_folder_path
 
-
-
-# Configura les rutes de les dades i arxius
-DATA_DIR = 'input/data_example/'
-DATABASE_DIR = 'users/data/'
+# Constants
+DATABASE_DIR = 'app/users/'
 DEFAULT_DB_NAME = 'user_database'
 
-def get_user_db_path(username, db_name=DEFAULT_DB_NAME):
+def create_user_table_from_file(file_path, username):
     """
-    Retorna el camí de la base de dades per l'usuari
+    Carrega un fitxer CSV/Excel a una base de dades SQLite de l'usuari
+    i retorna el nom de la taula creada
     """
-    return os.path.join(DATABASE_DIR, f'{username}_{db_name}.db')
-
-def load_user_file_to_sqlite(file_path, username):
-    """
-    Carrega un fitxer CSV a una base de dades SQLite de l'usuari
-    """
-    conn = sqlite3.connect(get_user_db_path(username))
-    df = pd.read_csv(file_path)
-    df.to_sql('NEW_TABLE', conn, if_exists='replace', index=False)
-    conn.close()
-    return 'NEW_TABLE'
-
-# --- CLEAN AI SQL RESPONSE ---
-
-def clean_sql_statements(text):
-    statements = re.findall(r"(ALTER TABLE.+?;|SELECT.+?;|CREATE VIEW.+?;|DROP VIEW.+?;)", text, re.DOTALL | re.IGNORECASE)
-    return "\n".join([s.strip() for s in statements])
-
-# --- SQLITE & DATA UTILITIES ---
-
-def load_user_file_to_sqlite(file_path, username):
     db_path = get_user_db_path(username)
     conn = sqlite3.connect(db_path)
     table_name = get_clean_table_name(file_path)
 
-    # Determinar format
+    # Determinar format del fitxer
     _, ext = os.path.splitext(file_path)
     ext = ext.lower()
+
     if ext in ['.xlsx', '.xls']:
         df = pd.read_excel(file_path)
     elif ext == '.csv':
+        # Provar diferents separadors
         for sep in [',', ';', '\t', '|']:
             try:
                 df = pd.read_csv(file_path, sep=sep)
@@ -77,191 +51,187 @@ def load_user_file_to_sqlite(file_path, username):
     else:
         raise ValueError("Format de fitxer no suportat.")
 
-    # Neteja bàsica
+    # Neteja bàsica del DataFrame
     df.columns = df.columns.str.strip()
     df = df.loc[:, df.columns.notna()]
     df = df.loc[:, df.columns != '']
-    for col in df.select_dtypes(include=['object']):
-        df[col] = df[col].str.strip()
 
+    # Netejar strings
+    for col in df.select_dtypes(include=['object']):
+        df[col] = df[col].astype(str).str.strip()
+
+    # Guardar a SQLite
     df.to_sql(table_name, conn, if_exists='replace', index=False)
     conn.close()
+
+    print(f"✅ Taula '{table_name}' creada correctament")
     return table_name
 
-def get_records_with_headers(cursor, table_name, n=5):
-    cursor.execute(f"PRAGMA table_info({table_name})")
-    headers = [info[1] for info in cursor.fetchall()]
-    cursor.execute(f"SELECT * FROM {table_name} LIMIT {n}")
-    records = cursor.fetchall()
-    headers_text = ", ".join(headers)
-    records_text = "\n".join([", ".join(map(str, r)) for r in records])
-    return f"The table is '{table_name}'.\n{headers_text}\n{records_text}"
-
-def get_numeric_statistics(cursor, table_name):
-    cursor.execute(f"PRAGMA table_info({table_name});")
-    columns = cursor.fetchall()
-    statistics = {}
-    for col in columns:
-        col_name, col_type = col[1], col[2]
-        if col_type.upper() in ["INTEGER", "REAL"]:
-            cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
-            count = cursor.fetchone()[0]
-            cursor.execute(f"SELECT MIN({col_name}), MAX({col_name}), AVG({col_name}) FROM {table_name}")
-            minimum, maximum, mean = cursor.fetchone()
-            statistics[col_name] = {'count': count, 'min': minimum, 'max': maximum, 'mean': mean}
-    result = f"Statistics of numeric columns in table '{table_name}':\n\n"
-    for column, stats in statistics.items():
-        result += (f"Column: {column}\n  Count: {stats['count']}\n  Min: {stats['min']}\n"
-                   f"  Max: {stats['max']}\n  Mean: {stats['mean']}\n\n")
-    return result
-
-def get_categorical_catalog(cursor, table_name, max_elements=30):
-    cursor.execute(f"PRAGMA table_info({table_name});")
-    columns = cursor.fetchall()
-    catalog = {}
-    for col in columns:
-        col_name, col_type = col[1], col[2]
-        if col_type.upper() not in ["INTEGER", "REAL"]:
-            cursor.execute(f"SELECT COUNT(DISTINCT \"{col_name}\") FROM \"{table_name}\";")
-            distinct_count = cursor.fetchone()[0]
-            if distinct_count < max_elements:
-                cursor.execute(f"SELECT DISTINCT \"{col_name}\" FROM \"{table_name}\";")
-                values = [row[0] for row in cursor.fetchall()]
-                catalog[col_name] = values
-    result = "Catalog of categorical variables:\n"
-    for column, values in catalog.items():
-        result += f"{column}: {', '.join(map(str, values))}\n"
-    return result
-
-# --- AI SQL PROMPTS ---
-
-def prompt_new_column_ideas(reg_txt, num_stats, cat_cat):
-    query = (
-        "As an expert in data analysis, examine the following table and suggest which new calculated columns could be useful for a clustering analysis. "
-        "Only consider columns that are true transformations of existing data, such as: differences or ratios between numbers, duration between dates, etc. "
-        "DO NOT include variable categorizations, recodings, or groupings. "
-        "Do not include already existing or duplicated columns."
-        "You must be restrictive and give a maximum of 3 new columns, the most useful and meaningful for the analysis. Never more."
-        "If it is not possible to calculate any useful column, state this clearly. "
-        "Return only a list of new column ideas, without SQL code or additional comments.\n"
-        f"{reg_txt}\n{num_stats}\nCategorical variables:{cat_cat}"
-    )
-    return prompt_AI(query)
-
-def prompt_sql_new_columns(ideas, reg_txt, num_stats, cat_cat):
-    query = (
-        "Based on these ideas for new calculated columns for clustering:\n"
-        f"{ideas}\n"
-        "Generate only the SQL code to implement them in the table using 'ALTER TABLE ... ADD COLUMN ... AS (...'. "
-        "Do not return comments or explanations. "
-        "If there is no possible new column, return only '-- NO NEW COLUMNS POSSIBLE --'.\n"
-        f"{reg_txt}\n{num_stats}\nCategorical variables:{cat_cat}"
-    )
-    ai_response = prompt_AI(query)
-    sql_statement = clean_sql_statements(ai_response)
-    print("\n--- SQL GENERATED BY AI (Feature Engineering) ---")
-    print(sql_statement)
-    print("------------------------------------------------\n")
-    return sql_statement
-
-def prompt_feature_engineering(reg_txt, ideas, num_stats, cat_cat):
-    print("\n--- IDEAS FOR NEW COLUMNS ---")
-    print(ideas)
-    print("--------------------------------\n")
-    sql_statement = prompt_sql_new_columns(ideas, reg_txt, num_stats, cat_cat)
-    # If the response is the signal that there are no new columns, return None
-    if not sql_statement or '-- NO NEW COLUMNS POSSIBLE --' in sql_statement:
-        return None
-    return sql_statement
-
-def prompt_column_selection_clustering(reg_txt, num_stats, cat_cat):
-    query = (
-        "You are an expert SQL code generator for clustering analysis. "
-        "Select the most relevant columns of the table for a k-means clustering model, "
-        "including numeric and categorical variables. Return only the SQL statement selecting those columns, for example: "
-        "SELECT column1, column2, column3 FROM TABLA;"
-        "Do not write comments or explanations, only the SQL query.\n"
-        f"The table is as follows: {reg_txt}\n{num_stats}\nCategorical variables:{cat_cat}"
-    )
-    ai_response = prompt_AI(query)
-    sql_statement = clean_sql_statements(ai_response)
-    print("\n--- SQL GENERATED BY AI (Column Selection) ---")
-    print(sql_statement)
-    print("-----------------------------------------------------\n")
-    return sql_statement
-
-def prompt_important_columns(variables):
-    query = (
-        "You are an expert in clustering."
-        "We are a travel agency and our goal is to achieve effective segmentation of our customers so we can provide personalized recommendations to them."
-        "From a list of variables, you must select a maximum of three variables that you consider most relevant to achieve segmentation that meets our objective,such as the customer's age."
-        "You should return the list of variables each written in quotation marks and separated by commas, all enclosed in square brackets, WITHOUT ANY OTHER CHARACTER \n"
-        f"The list of variables is as follows:{variables}"
-    )
-    return prompt_AI(query)
-
-
-# --- MAIN PIPELINE FLOW ---
-
-def prepare_sqlite_and_view(file, username, max_retries=10):
-    db_file = get_user_db_path(username)  # Asegurat que utilitzes el path correcte per la base de dades de l'usuari
-    table_name = 'NEW_TABLE'
-    conn = sqlite3.connect(db_file)
+def get_table_info(username, table_name):
+    """
+    Obté informació de la taula per generar prompts d'IA
+    """
+    db_path = get_user_db_path(username)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    
-    # Ara utilitzem la ruta del fitxer directament, passant el camí absolut o relatiu
-    file_path = file  # Si 'file' ja és una ruta del fitxer, no cal canviar-ho
-    
-    # Càrrega de fitxer a SQLite
-    table_name = load_user_file_to_sqlite(file_path, username)  # Utilitza la funció definida prèviament
 
-    # 1. Informació inicial per a feature engineering
-    reg_txt = get_records_with_headers(cursor, table_name)
-    num_stats = get_numeric_statistics(cursor, table_name)
-    cat_cat = get_categorical_catalog(cursor, table_name)
+    # Obtenir informació de columnes
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    columns_info = cursor.fetchall()
 
-    # 2. Feature engineering (nous columns) amb millora de reintents
-    attempts = 0
-    last_error = ""
-    while attempts < max_retries:
-        if attempts == 0:
-            # Primer intent: prompt normal
-            ideas = prompt_new_column_ideas(reg_txt, num_stats, cat_cat)
-        else:
-            # Nous intents: inclou l'error en el prompt per ajudar la IA
-            error_message = f"\nNote: The previous SQL code failed with the following SQLite error: {last_error}. Please avoid using unsupported functions or syntax."
-            ideas = prompt_new_column_ideas(reg_txt, num_stats, cat_cat) + error_message
+    # Obtenir una mostra de dades
+    cursor.execute(f"SELECT * FROM {table_name} LIMIT 5")
+    sample_data = cursor.fetchall()
 
-        sql_statement_columns = prompt_feature_engineering(reg_txt, ideas, num_stats, cat_cat)
-        if not sql_statement_columns:
-            print("No new columns generated, skipping this step.")
-            break
-        
-        # Validació abans d'executar
-        try:
-            cursor.executescript(sql_statement_columns)
-            conn.commit()
-            print("Feature engineering executed successfully.")
-            break  # Exit si l'operació és exitosa
-        except Exception as e:
-            last_error = str(e)
-            attempts += 1
-            print(f"Error executing feature engineering SQL (attempt {attempts}/{max_retries}): {e}")
-            if attempts >= max_retries:
-                print("Permanent failure executing feature engineering SQL after several attempts.")
-                break  # O raise, segons la preferència
+    # Crear text descriptiu
+    headers = [col[1] for col in columns_info]
+    headers_text = ", ".join(headers)
 
-    # Continua el procés per aplicar altres operacions després...
-    # ...
+    sample_text = ""
+    for row in sample_data:
+        sample_text += ", ".join([str(val) for val in row]) + "\n"
+
     conn.close()
-    return db_file
 
+    return {
+        'headers': headers,
+        'headers_text': headers_text,
+        'sample_data': sample_text,
+        'columns_info': columns_info
+    }
+
+def generate_clustering_table_sql(username, original_table_name):
+    """
+    Genera SQL amb IA per crear una taula de clustering modificada
+    """
+    table_info = get_table_info(username, original_table_name)
+
+    clustering_table_name = f"{original_table_name}_clustering"
+
+    prompt = f"""
+Ets un expert en SQL i análisis de dades. 
+
+Tens una taula anomenada '{original_table_name}' amb les següents columnes:
+{table_info['headers_text']}
+
+Mostra de dades:
+{table_info['sample_data']}
+
+Genera una sentència SQL CREATE TABLE per crear una nova taula anomenada '{clustering_table_name}' 
+que contingui NOMÉS les columnes més rellevants per fer clustering (análisis de segments).
+
+Regles:
+1. Selecciona només columnes numèriques o categòriques útils per clustering
+2. Evita IDs, noms o columnes identificatives
+3. Inclou columnes que puguin revelar patrons de comportament
+4. La sentència ha de ser: CREATE TABLE {clustering_table_name} AS SELECT ... FROM {original_table_name};
+5. No afegeixis comentaris, només el SQL
+
+Retorna només la sentència SQL:
+"""
+
+    sql_response = prompt_AI(prompt)
+
+    # Netejar la resposta
+    sql_clean = re.search(r'CREATE TABLE.*?;', sql_response, re.DOTALL | re.IGNORECASE)
+    if sql_clean:
+        return sql_clean.group(0).strip()
+    else:
+        raise ValueError("No s'ha pogut generar SQL vàlid")
+
+def generate_feature_engineering_sql(username, clustering_table_name):
+    """
+    Genera SQL amb IA per modificar la taula de clustering amb noves columnes calculades
+    """
+    table_info = get_table_info(username, clustering_table_name)
+
+    prompt = f"""
+Ets un expert en feature engineering per clustering.
+
+Tens una taula de clustering anomenada '{clustering_table_name}' amb columnes:
+{table_info['headers_text']}
+
+Mostra de dades:
+{table_info['sample_data']}
+
+Genera sentències SQL ALTER TABLE per afegir MÀXIM 2 noves columnes calculades útils per clustering.
+Exemples: ràtios entre variables, diferències, transformacions matemàtiques.
+
+Regles:
+1. Màxim 2 columnes noves
+2. Només columnes realment útils per segmentació
+3. Utilitza funcions SQL estàndard
+4. Format: ALTER TABLE {clustering_table_name} ADD COLUMN nom_columna AS (càlcul);
+5. Si no és possible calcular columnes útils, retorna només: -- NO NEW COLUMNS --
+
+Retorna només les sentències SQL (una per línia):
+"""
+
+    sql_response = prompt_AI(prompt)
+
+    if "-- NO NEW COLUMNS --" in sql_response:
+        print("🔍 No es poden generar noves columnes calculades")
+        return None
+
+    # Extreure sentències ALTER TABLE
+    alter_statements = re.findall(r'ALTER TABLE.*?;', sql_response, re.DOTALL | re.IGNORECASE)
+    if alter_statements:
+        return '\n'.join(alter_statements)
+    else:
+        print("🔍 No s'han trobat sentències ALTER TABLE vàlides")
+        return None
+
+def execute_sql_statements(username, sql_statements):
+    """
+    Executa sentències SQL a la base de dades de l'usuari
+    """
+    if not sql_statements:
+        return True
+
+    db_path = get_user_db_path(username)
+    conn = sqlite3.connect(db_path)
+
+    try:
+        # Dividir en sentències individuals si hi ha múltiples
+        statements = [stmt.strip() for stmt in sql_statements.split(';') if stmt.strip()]
+
+        for statement in statements:
+            print(f"🔄 Executant: {statement[:100]}...")
+            conn.execute(statement + ';')
+
+        conn.commit()
+        conn.close()
+        print("✅ SQL executat correctament")
+        return True
+
+    except Exception as e:
+        conn.close()
+        print(f"❌ Error executant SQL: {e}")
+        return False
+
+def prepare_clustering_data(username, clustering_table_name):
+    """
+    Prepara les dades per al clustering des de la taula SQL
+    """
+    db_path = get_user_db_path(username)
+    conn = sqlite3.connect(db_path)
+
+    try:
+        df = pd.read_sql_query(f"SELECT * FROM {clustering_table_name}", conn)
+        conn.close()
+        print(f"✅ Dades carregades: {df.shape[0]} files, {df.shape[1]} columnes")
+        return df
+    except Exception as e:
+        conn.close()
+        print(f"❌ Error carregant dades: {e}")
+        return None
 
 def handle_high_cardinality_categoricals(df, max_card=20, top_n=10):
-    """Groups infrequent categories into 'Other' and excludes variables with excessive cardinality."""
+    """Agrupa categories poc freqüents en 'Other' i exclou variables amb cardinalitat excessiva."""
     df_result = df.copy()
     categoricals = [col for col in df_result.select_dtypes(include=['object', 'category']).columns]
     cols_to_use = []
+
     for col in categoricals:
         num_unique = df_result[col].nunique(dropna=False)
         if num_unique > max_card:
@@ -269,214 +239,235 @@ def handle_high_cardinality_categoricals(df, max_card=20, top_n=10):
         top_cats = df_result[col].value_counts().nlargest(top_n).index
         df_result[col] = df_result[col].apply(lambda x: x if x in top_cats else 'Other')
         cols_to_use.append(col)
+
     return df_result, cols_to_use
 
-def read_clustering_data(db_file='data/base_sql.db'):
-    db_file = db_file  # ← Aquí
-    conn = sqlite3.connect(db_file)
-    try:
-        try:
-            df = pd.read_sql_query("SELECT * FROM clustering_table;", conn)
-            print("Leído desde la vista clustering_table.")
-        except Exception as e:
-            print(f"clustering_table no existe o no se puede leer ({e}), usando NEW_TABLE.")
-            df = pd.read_sql_query("SELECT * FROM NEW_TABLE;", conn)
-            print("Leído desde la tabla NEW_TABLE.")
-    finally:
-        conn.close()
-    return df
+def detect_optimal_clusters(X, min_k=2, max_k=6):
+    """Detecta el nombre òptim de clusters"""
+    if len(X) < min_k:
+        return min_k
 
-def detect_columns(df):
-    categoricals = [col for col in df.select_dtypes(include=['object', 'category']).columns 
-                   if df[col].nunique() < min(20, 0.5*len(df))]
-    numerics = df.select_dtypes(include=['number']).columns.tolist()
-    return numerics, categoricals
+    # Mètode del colze
+    costs = []
+    for k in range(min_k, min(max_k + 1, len(X))):
+        kmeans = KMeans(n_clusters=k, n_init=10, random_state=42)
+        kmeans.fit(X)
+        costs.append(kmeans.inertia_)
 
-def balanced_kmeans(X, n_clusters, max_iter=100):
-    n_samples = X.shape[0]
-    size_min = n_samples // n_clusters
-    size_max = size_min + (n_samples % n_clusters > 0)
-    # Inicialización de centroides
-    kmeans = KMeans(n_clusters=n_clusters, n_init=10, random_state=0)
-    centroids = kmeans.fit(X).cluster_centers_
-    labels = np.full(n_samples, -1)
-    for _ in range(max_iter):
-        distances = np.linalg.norm(X[:, np.newaxis] - centroids, axis=2)
-        idx_sorted = np.argsort(np.min(distances, axis=1))
-        assigned = [0]*n_clusters
-        labels.fill(-1)
-        for i in idx_sorted:
-            centroid_order = np.argsort(distances[i])
-            for c in centroid_order:
-                if assigned[c] < size_max:
-                    labels[i] = c
-                    assigned[c] += 1
-                    break
-        new_centroids = np.array([X[labels == c].mean(axis=0) if np.any(labels==c) else centroids[c] for c in range(n_clusters)])
-        if np.allclose(centroids, new_centroids):
-            break
-        centroids = new_centroids
-    return labels
+    if len(costs) > 1:
+        kl = KneeLocator(range(min_k, min_k + len(costs)), costs, curve="convex", direction="decreasing")
+        if kl.elbow is not None:
+            return max(min_k, min(kl.elbow, max_k))
 
-def assign_clusters_df(df, n_clusters=0, max_card=20, top_n=10, min_k=3, max_k=6):
-    df_proc, categoricals = handle_high_cardinality_categoricals(df, max_card=max_card, top_n=top_n)
+    # Si no hi ha colze clar, usar silhouette
+    silhouette_scores = []
+    for k in range(min_k, min(max_k + 1, len(X))):
+        kmeans = KMeans(n_clusters=k, n_init=10, random_state=42)
+        labels = kmeans.fit_predict(X)
+        if len(set(labels)) > 1:
+            score = silhouette_score(X, labels)
+        else:
+            score = -1
+        silhouette_scores.append(score)
+
+    return np.argmax(silhouette_scores) + min_k
+
+def perform_clustering(df, n_clusters=0):
+    """
+    Realitza el clustering sobre el DataFrame preparat
+    """
+    # Processar variables categòriques
+    df_proc, categoricals = handle_high_cardinality_categoricals(df)
     numerics = df_proc.select_dtypes(include=['number']).columns.tolist()
+
+    # Crear variables dummy per categòriques
     df_cat = pd.get_dummies(df_proc[categoricals], drop_first=False) if categoricals else pd.DataFrame(index=df_proc.index)
+
+    # Escalar variables numèriques
     scaler = RobustScaler()
     X_num = scaler.fit_transform(df_proc[numerics]) if numerics else np.zeros((len(df_proc), 0))
+
+    # Combinar tots els features
     X = np.concatenate([X_num, df_cat.values], axis=1) if df_cat.shape[1] > 0 else X_num
 
-    feature_names = numerics + list(df_cat.columns)
-    vars_importantes = prompt_important_columns(feature_names)
-    importantes_idx = [i for i, name in enumerate(feature_names) if name in vars_importantes or any(name.startswith(var + "_") for var in vars_importantes)]
-    if importantes_idx:
-        X_importantes = X[:, importantes_idx]
-        feature_names_dup = [name + "_dup" for name in feature_names]
-        X = np.concatenate([X, X_importantes], axis=1)
-        feature_names = feature_names + feature_names_dup
-
-    # Selección automática del número de clústers dentro del rango [min_k, max_k]
-    n_clusters_used = n_clusters
-    metodo_usado = ""
+    # Determinar nombre de clusters
     if n_clusters == 0:
-        # 1. Método del codo (KneeLocator sobre inercia)
-        costs = []
-        for k in range(min_k, max_k + 1):
-            kmeans = KMeans(n_clusters=k, n_init=10, random_state=0)
-            kmeans.fit(X)
-            costs.append(kmeans.inertia_)
-        kl = KneeLocator(range(min_k, max_k + 1), costs, curve="convex", direction="decreasing")
-        elbow = kl.elbow
-        if elbow is not None:
-            n_clusters_used = max(min_k, min(elbow, max_k))
-            metodo_usado = "Método del codo (inercia)"
-        else:
-            # 2. Si no hay codo claro, usamos coeficiente de silueta
-            silhouette_scores = []
-            for k in range(min_k, max_k + 1):
-                kmeans = KMeans(n_clusters=k, n_init=10, random_state=0)
-                labels = kmeans.fit_predict(X)
-                if len(set(labels)) > 1:
-                    score = silhouette_score(X, labels)
-                else:
-                    score = -1
-                silhouette_scores.append(score)
-            n_clusters_used = np.argmax(silhouette_scores) + min_k
-            metodo_usado = "Coeficiente de silueta"
-        print(f"El número óptimo de clústers es {n_clusters_used} (Método utilizado: {metodo_usado})")
-    else:
-        n_clusters_used = n_clusters
-        metodo_usado = "Valor especificado por el usuario"
+        n_clusters = detect_optimal_clusters(X)
+        print(f"🎯 Nombre òptim de clusters detectat: {n_clusters}")
 
-    # KMeans normal
-    kmeans = KMeans(n_clusters=n_clusters_used, random_state=42, n_init=10)
-    df['Cluster'] = kmeans.fit_predict(X)
-    cluster_counts = df['Cluster'].value_counts(normalize=True).sort_index()
+    # Aplicar KMeans
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+    df_result = df.copy()
+    df_result['cluster'] = kmeans.fit_predict(X)
+
+    # Mostrar distribució de clusters
+    cluster_counts = df_result['cluster'].value_counts(normalize=True).sort_index()
     cluster_percentages = (cluster_counts * 100).round(2)
 
-    print("\nPorcentaje de registros por clúster:")
+    print("\n📊 Distribució de clusters:")
     for cl, perc in cluster_percentages.items():
-        print(f"Cluster {cl}: {perc}%")
+        print(f"  Cluster {cl}: {perc}%")
 
-    min_percentage = cluster_percentages.min()
-    if min_percentage < 5:
-        print("\nAl menos un clúster tiene menos del 5% de los registros. Se utilizará Balanced KMeans.")
-        labels = balanced_kmeans(X, n_clusters_used)
-        df['Cluster'] = labels
-        # Recalcular los porcentajes
-        cluster_counts = df['Cluster'].value_counts(normalize=True).sort_index()
-        cluster_percentages = (cluster_counts * 100).round(2)
-        print("\nNuevo porcentaje de registros por clúster (balanceado):")
-        for cl, perc in cluster_percentages.items():
-            print(f"Cluster {cl}: {perc}%")
-    else:
-        print("\nNo es necesario balancear los clústers.")
+    return df_result, n_clusters
 
-    print(f"\nMétodo utilizado para determinar el número de clústers: {metodo_usado}")
+def generate_cluster_summary(df, n_clusters):
+    """
+    Genera un resum dels clusters
+    """
+    numerics = df.select_dtypes(include=['number']).columns.tolist()
+    numerics = [col for col in numerics if col != 'cluster']  # Excloure la columna cluster
+    categoricals = [col for col in df.select_dtypes(include=['object', 'category']).columns]
 
-    return df, n_clusters_used
+    cluster_summary = {}
 
-
-def generate_clusters_dict(
-    df, 
-    n_clusters=4,
-    top_n_cat=2,
-    cat_threshold=2,
-    decimals=1
-):
-    numerics, categoricals = detect_columns(df)
-    segments_dict = {}
+    # Estadístiques globals
     global_num_mean = {col: float(df[col].mean()) for col in numerics}
     global_cat_dist = {col: df[col].value_counts(normalize=True).to_dict() for col in categoricals}
+
     for i in range(n_clusters):
-        group = df[df['Cluster'] == i]
+        group = df[df['cluster'] == i]
         if len(group) == 0:
             continue
+
         cluster_info = {
-            'Cluster': int(i),
-            'Size': int(len(group)),
-            'Share': float(round(len(group) / len(df) * 100, decimals))
+            'cluster_id': int(i),
+            'size': int(len(group)),
+            'percentage': float(round(len(group) / len(df) * 100, 1))
         }
-        num_stats = {}
-        for col in numerics:
-            if col.lower() == "cluster":
-                continue
-            clus_mean = float(group[col].mean())
-            global_mean = global_num_mean[col]
-            diff = abs(clus_mean - global_mean)
-            if diff >= 0.01:
-                num_stats[col] = {
-                    'c': float(round(clus_mean, decimals)),
-                    'g': float(round(global_mean, decimals))
-                }
-        if num_stats:
-            cluster_info['num'] = num_stats
-        cat_stats = {}
-        for col in categoricals:
-            clus_counts = group[col].value_counts(normalize=True)
-            global_counts = global_cat_dist[col]
-            values = set(clus_counts.index).union(global_counts.keys())
-            diffs = [
-                (v, abs(clus_counts.get(v, 0)*100 - global_counts.get(v, 0)*100))
-                for v in values
-            ]
-            diffs.sort(key=lambda x: x[1], reverse=True)
-            selected = []
-            for v, diff in diffs:
-                if diff >= cat_threshold or len(selected) < top_n_cat:
-                    selected.append(v)
-            val_stats = {
-                v: {
-                    'c': float(round(clus_counts.get(v, 0)*100, decimals)),
-                    'g': float(round(global_counts.get(v, 0)*100, decimals))
-                }
-                for v in selected
-            }
-            cat_stats[col] = val_stats
-        if cat_stats:
-            cluster_info['cat'] = cat_stats
-        segments_dict[i] = cluster_info
-    return segments_dict
 
-def full_clustering_flow(file, n_clusters=0):
-    print("=== 1. prepare_sqlite_and_view ===")
-    db_file = prepare_sqlite_and_view(file)
-    print("=== 2. read_clustering_data ===")
-    df = read_clustering_data(db_file)
-    print("=== 3. assign_clusters_df ===")
-    df_clusters, n_clusters_used = assign_clusters_df(df, n_clusters)
-    print("=== 4. generate_clusters_dict ===")
-    cluster_summary = generate_clusters_dict(df_clusters, n_clusters_used)
+        # Estadístiques numèriques
+        if numerics:
+            num_stats = {}
+            for col in numerics:
+                cluster_mean = float(group[col].mean())
+                global_mean = global_num_mean[col]
+                if abs(cluster_mean - global_mean) >= 0.01:
+                    num_stats[col] = {
+                        'cluster_mean': round(cluster_mean, 2),
+                        'global_mean': round(global_mean, 2),
+                        'difference': round(cluster_mean - global_mean, 2)
+                    }
+            if num_stats:
+                cluster_info['numeric_features'] = num_stats
 
-    # Guardar la columna 'Cluster' en la tabla NEW_TABLE
-    print("=== 5. Guardando nueva tabla en SQLite ===")
-    conn = sqlite3.connect(db_file)
-    df_clusters = df_clusters.rename(columns={'Cluster': 'cluster'})
-    df_clusters.to_sql('NEW_TABLE', conn, if_exists='replace', index=False)
-    conn.close()
+        # Estadístiques categòriques
+        if categoricals:
+            cat_stats = {}
+            for col in categoricals:
+                cluster_dist = group[col].value_counts(normalize=True)
+                global_dist = global_cat_dist[col]
 
-    print("=== 6. Clustering flow terminado ===")
-    print(cluster_summary)
+                significant_categories = {}
+                for cat in cluster_dist.index:
+                    cluster_pct = cluster_dist[cat] * 100
+                    global_pct = global_dist.get(cat, 0) * 100
+                    if abs(cluster_pct - global_pct) >= 5:  # Diferència significativa
+                        significant_categories[cat] = {
+                            'cluster_pct': round(cluster_pct, 1),
+                            'global_pct': round(global_pct, 1),
+                            'difference': round(cluster_pct - global_pct, 1)
+                        }
+
+                if significant_categories:
+                    cat_stats[col] = significant_categories
+
+            if cat_stats:
+                cluster_info['categorical_features'] = cat_stats
+
+        cluster_summary[f"cluster_{i}"] = cluster_info
+
     return cluster_summary
 
-full_clustering_flow('input/data_example/clients_variats.csv', 0)
+def save_clustering_summary(username, clustering_summary, table_name):
+    """
+    Guarda el resum de clustering com a JSON a la carpeta de l'usuari
+    """
+    from django.conf import settings
+    user_clusters_folder = settings.get_user_clusters_dir(username)
+    summary_path = os.path.join(str(user_clusters_folder), f'{table_name}_clustering_summary.json')
+
+def save_clustering_results(username, table_name, df_clustered, cluster_summary):
+    """
+    Guarda els resultats del clustering
+    """
+    user_folder = get_user_folder_path(username)
+    clusters_folder = get_user_folder_path(username, 'clusters')
+
+    # Guardar DataFrame amb clusters a SQLite
+    db_path = get_user_db_path(username)
+    conn = sqlite3.connect(db_path)
+    df_clustered.to_sql(f"{table_name}_clustering_results", conn, if_exists='replace', index=False)
+    conn.close()
+
+    # Guardar resum en JSON a la carpeta clusters
+    json_filename = f"{table_name}_clustering_summary.json"
+    json_path = os.path.join(clusters_folder, json_filename)
+
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump(cluster_summary, f, indent=2, ensure_ascii=False)
+
+    print(f"✅ Resultats guardats:")
+    print(f"   - Taula SQL: {table_name}_clustering_results")
+    print(f"   - Resum JSON: {json_filename}")
+
+    return json_path
+
+def full_clustering_pipeline(file_path, username, n_clusters=0):
+    """
+    Pipeline complet de clustering amb generació SQL amb IA
+    """
+    print("🚀 Iniciant pipeline de clustering...")
+
+    try:
+        # 1. Crear taula original
+        print("\n📁 Pas 1: Carregant fitxer a SQLite...")
+        original_table_name = create_user_table_from_file(file_path, username)
+
+        # 2. Generar taula de clustering amb IA
+        print("\n🤖 Pas 2: Generant taula de clustering amb IA...")
+        clustering_sql = generate_clustering_table_sql(username, original_table_name)
+        print(f"SQL generat: {clustering_sql}")
+
+        if not execute_sql_statements(username, clustering_sql):
+            raise Exception("Error executant SQL de taula de clustering")
+
+        clustering_table_name = f"{original_table_name}_clustering"
+
+        # 3. Feature engineering amb IA
+        print("\n🔧 Pas 3: Feature engineering amb IA...")
+        feature_sql = generate_feature_engineering_sql(username, clustering_table_name)
+        if feature_sql:
+            print(f"Feature engineering SQL: {feature_sql}")
+            execute_sql_statements(username, feature_sql)
+
+        # 4. Carregar dades per clustering
+        print("\n📊 Pas 4: Preparant dades per clustering...")
+        df = prepare_clustering_data(username, clustering_table_name)
+        if df is None:
+            raise Exception("Error carregant dades de clustering")
+
+        # 5. Realizar clustering
+        print("\n🎯 Pas 5: Executant clustering...")
+        df_clustered, n_clusters_used = perform_clustering(df, n_clusters)
+
+        # 6. Generar resum
+        print("\n📋 Pas 6: Generant resum de clusters...")
+        cluster_summary = generate_cluster_summary(df_clustered, n_clusters_used)
+
+        # 7. Guardar resultats
+        print("\n💾 Pas 7: Guardant resultats...")
+        json_path = save_clustering_results(username, original_table_name, df_clustered, cluster_summary)
+
+        print(f"\n🎉 Pipeline completat exitosament!")
+        print(f"📄 Resum guardat a: {json_path}")
+
+        return cluster_summary, json_path
+
+    except Exception as e:
+        print(f"\n❌ Error en el pipeline: {str(e)}")
+        raise e
+
+# Funció per mantenir compatibilitat amb el codi existent
+def full_clustering_flow(file_path, username, n_clusters=0):
+    """Wrapper per compatibilitat amb el codi existent"""
+    return full_clustering_pipeline(file_path, username, n_clusters)

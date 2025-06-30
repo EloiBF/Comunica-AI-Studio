@@ -1,0 +1,64 @@
+{
+  "cluster_0": {
+    "cluster_id": 0,
+    "size": 692,
+    "percentage": 69.2,
+    "categorical_features": {
+      "sector": {
+        "Automoció": {
+          "cluster_pct": 21.5,
+          "global_pct": 14.9,
+          "difference": 6.6
+        },
+        "Retail": {
+          "cluster_pct": 20.5,
+          "global_pct": 14.2,
+          "difference": 6.3
+        },
+        "Educació": {
+          "cluster_pct": 19.9,
+          "global_pct": 13.8,
+          "difference": 6.1
+        },
+        "Turisme": {
+          "cluster_pct": 19.1,
+          "global_pct": 13.2,
+          "difference": 5.9
+        },
+        "Finance": {
+          "cluster_pct": 18.9,
+          "global_pct": 13.1,
+          "difference": 5.8
+        }
+      }
+    }
+  },
+  "cluster_1": {
+    "cluster_id": 1,
+    "size": 158,
+    "percentage": 15.8,
+    "categorical_features": {
+      "sector": {
+        "Salut": {
+          "cluster_pct": 100.0,
+          "global_pct": 15.8,
+          "difference": 84.2
+        }
+      }
+    }
+  },
+  "cluster_2": {
+    "cluster_id": 2,
+    "size": 150,
+    "percentage": 15.0,
+    "categorical_features": {
+      "sector": {
+        "Tecnologia": {
+          "cluster_pct": 100.0,
+          "global_pct": 15.0,
+          "difference": 85.0
+        }
+      }
+    }
+  }
+}

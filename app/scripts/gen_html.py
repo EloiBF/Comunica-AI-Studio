@@ -16,16 +16,16 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 
 from django.conf import settings
 
+# Funcions per rutes dinàmiques d'usuari
+def get_user_html_dir(username):
+    """Retorna la carpeta HTML de l'usuari"""
+    return settings.BASE_DIR / 'app' / 'users' / username / 'htmls'
+
 # Accedir a les rutes configurades a settings.py
 TEMPLATE_DIR = settings.TEMPLATE_DIR
 IMAGES_DIR = settings.IMAGES_DIR
 IMAGES_JSON = settings.IMAGES_JSON
-HTML_OUTPUT = settings.HTML_OUTPUT
 
-print("Ruta plantilles:", TEMPLATE_DIR)
-print("Ruta imatges:", IMAGES_DIR)
-print("Fitxer imatges JSON:", IMAGES_JSON)
-print("Ruta de sortida HTML:", HTML_OUTPUT)
 
 
 def load_template(template_name: str) -> str:
@@ -121,26 +121,20 @@ def render_template(template_str: str, data: dict) -> str:
 
 
 # Script principal per generar HTML a partir d'un prompt i una plantilla --> no usat directament a l'aplicació, però útil per proves i generació manual
-def main(prompt: str, template_name: str = "sale.html", name_html: str = "oferta_especial") -> None:
+def main(prompt: str, username: str, template_name: str = "sale.html") -> None:
     print("🔄 Generant contingut amb Groq...")
     data = generate_content_from_prompt(prompt, template_name)
-
-    # Afegim imatge temporalment genèrica
+    # Afegir imatge temporalment genèrica
     data["image_url"] = "https://via.placeholder.com/600x300.png?text=Oferta+Especial"
-
     print("📄 Carregant plantilla...")
     template = load_template(template_name)
-
     print("🧠 Renderitzant plantilla amb contingut...")
     html_final = render_template(template, data)
-
-    # Guardar el resultat generat a la ruta configurada en settings.py
-    name_html = f'{name_html}.html'  # Nom del fitxer HTML a generar
-    output_path = HTML_OUTPUT / name_html
+    # Guardar el resultat generat a la ruta configurada per a l'usuari
+    output_path = get_user_html_dir(username) / f'{prompt}.html'
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html_final)
-
     print(f"✅ HTML generat i guardat a: {output_path}")
 
 if __name__ == "__main__":
