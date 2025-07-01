@@ -1251,7 +1251,9 @@ small {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 200px;
+    min-height: 100px;
+    text-align: center;
+    padding: var(--space-1) var(--space-6);
 }
 
 /* Mobile responsive for data table */
@@ -1524,7 +1526,7 @@ small {
 
 .template-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(5, 1fr);
     gap: var(--space-4);
     margin-top: var(--space-3);
 }
@@ -2277,10 +2279,6 @@ small {
     font-size: var(--font-size-sm);
 }
 
-.empty-state {
-    text-align: center;
-    padding: var(--space-12) var(--space-6);
-}
 
 .empty-state-icon {
     background: var(--gray-100);

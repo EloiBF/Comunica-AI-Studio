@@ -28,34 +28,44 @@ def landing(request):
 
 # Signup
 def signup_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            # Crear el perfil de l'usuari després del registre
-            UserProfile.objects.create(user=user)
-            login(request, user)
-            return redirect('dashboard')  # Redirigeix a la pàgina de panell
+            try:
+                user = form.save()
+                # El UserProfile es crea automàticament amb els signals
+                login(request, user)
+                return redirect('dashboard')
+            except Exception as e:
+                form.add_error(None, 'Error creant el compte. Si us plau, torna-ho a intentar.')
     else:
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
 # Login
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            # Comprovar si el perfil ja existeix, sinó, crear-lo
-            if not hasattr(user, 'profile'):
-                UserProfile.objects.create(user=user)
-            return redirect('dashboard')  # O redirigeix a la pàgina que desitgis
-        else:
-            return render(request, 'login.html', {'form': form})
+            
+            # Assegurar-se que el UserProfile existeix
+            UserProfile.objects.get_or_create(user=user)
+            
+            # Redirigir a la pàgina següent o dashboard
+            next_url = request.GET.get('next', 'dashboard')
+            return redirect(next_url)
     else:
         form = AuthenticationForm()
-        return render(request, 'login.html', {'form': form})
+    
+    return render(request, 'login.html', {'form': form})
     
 # Logout
 def logout_view(request):
@@ -121,8 +131,9 @@ def generate(request):
 
     # Detectar subscripció
     try:
-        subscription = request.user.userprofile.subscription
-    except UserProfile.DoesNotExist:
+        user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+        subscription = user_profile.subscription
+    except Exception:
         subscription = 'free'
 
     template_name = {
@@ -225,55 +236,53 @@ def generate(request):
 def clusters(request):
     from app.scripts.gen_clusters import full_clustering_pipeline
     from app.scripts.gen_clusters_desc import generar_descripcions_clusters
+    import os, json
 
+    # Obtenir el directori de l'usuari
     user_folder = get_user_folder_path(request.user.username)
-
     message = None
     selected_dataset = request.GET.get('dataset', None)
 
+    # Si el mètode és POST, gestionar el fitxer o l'eliminació del dataset
     if request.method == 'POST':
         if 'file' in request.FILES:
+            # Gestió de la càrrega del fitxer
             uploaded_file = request.FILES['file']
             n_clusters = int(request.POST.get('n_clusters', 0))
-
-            # Guardar fitxer temporalment
             user_data_dir = os.path.join(user_folder, 'data_files')
             os.makedirs(user_data_dir, exist_ok=True)
             file_path = os.path.join(user_data_dir, uploaded_file.name)
-
+            
+            # Guardar el fitxer temporalment
             with open(file_path, 'wb+') as destination:
                 for chunk in uploaded_file.chunks():
                     destination.write(chunk)
-
+            
             try:
-                # Generar clusters amb nou pipeline
+                # Generar clusters amb el pipeline
                 cluster_summary, json_path = full_clustering_pipeline(file_path, request.user.username, n_clusters)
-
-                # Extreure nom de taula del path del JSON
                 json_filename = os.path.basename(json_path)
                 table_name = json_filename.replace('_clustering_summary.json', '')
 
                 # Generar descripcions
                 clusters_descriptions = generar_descripcions_clusters(request.user.username, table_name)
-
                 message = "✅ Clusters generats correctament!"
                 selected_dataset = table_name
-
             except Exception as e:
-                print(f"Error generant clusters: {str(e)}")  # Log per debug
+                print(f"Error generant clusters: {str(e)}")  
                 message = "❌ Error processant el fitxer. Si us plau, revisa el format i torna-ho a intentar."
-
+        
         elif request.POST.get('delete_dataset'):
+            # Eliminació del dataset
             dataset_to_delete = request.POST.get('delete_dataset')
             try:
-                # Eliminar fitxers relacionats amb aquest dataset
+                # Fitxers associats al dataset
                 files_to_delete = [
                     f'{dataset_to_delete}_clustering_summary.json',
                     f'{dataset_to_delete}_clustering_descriptions.json'
                 ]
-
                 for file_name in files_to_delete:
-                    file_path = os.path.join(user_folder, file_name)
+                    file_path = os.path.join(user_folder, 'clusters', file_name)
                     if os.path.exists(file_path):
                         os.remove(file_path)
 
@@ -282,20 +291,19 @@ def clusters(request):
                 # Si estem visualitzant el dataset eliminat, netegem la selecció
                 if selected_dataset == dataset_to_delete:
                     selected_dataset = None
-
             except Exception as e:
-                print(f"Error eliminant dataset: {str(e)}")  # Log per debug
+                print(f"Error eliminant dataset: {str(e)}")  
                 message = "❌ Error eliminant el dataset. Si us plau, torna-ho a intentar."
 
-    # Obtenir tots els datasets disponibles (màxim 3) des de la carpeta clusters
+    # Obtenir tots els datasets disponibles (màxim 3)
     clusters_folder = get_user_folder_path(request.user.username, 'clusters')
     clustering_files = [f for f in os.listdir(clusters_folder) if f.endswith('_clustering_summary.json')] if os.path.exists(clusters_folder) else []
+    
     available_datasets = []
-
     for file_name in clustering_files:
         table_name = file_name.replace('_clustering_summary.json', '')
-        clusters_summary_path = os.path.join(str(clusters_folder), file_name)
-
+        clusters_summary_path = os.path.join(clusters_folder, file_name)
+        
         # Obtenir data de modificació
         mod_time = os.path.getmtime(clusters_summary_path)
 
@@ -304,7 +312,7 @@ def clusters(request):
             clusters_data = json.load(f)
 
         # Carregar descripcions si existeixen
-        clusters_desc_path = os.path.join(str(clusters_folder), f'{table_name}_clustering_descriptions.json')
+        clusters_desc_path = os.path.join(clusters_folder, f'{table_name}_clustering_descriptions.json')
         clusters_descriptions = None
         if os.path.exists(clusters_desc_path):
             with open(clusters_desc_path, 'r', encoding='utf-8') as f:
@@ -342,6 +350,35 @@ def clusters(request):
     })
 
 @login_required
+def delete_dataset(request):
+    if request.method == 'POST':
+        dataset_name = request.POST.get('delete_dataset')
+
+        try:
+            # Obtenir el dataset pel seu nom
+            dataset = Dataset.objects.get(name=dataset_name)
+        except Dataset.DoesNotExist:
+            raise Http404("Dataset no trobat")
+
+        # Ruta per eliminar els arxius JSON associats als clusters
+        json_files = dataset.get_json_files()  # Suposant que tens un mètode per obtenir els arxius JSON
+
+        # Eliminar els arxius JSON associats al dataset
+        for json_file in json_files:
+            file_path = os.path.join(settings.MEDIA_ROOT, json_file)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+        # Eliminar el dataset de la base de dades
+        dataset.delete()
+
+        # Redirigir a la pàgina amb un missatge d'èxit
+        return redirect('clusters_page')  # Redirigeix on correspongui
+
+    return redirect('clusters_page')  # Si no és un POST, redirigeix
+
+
+@login_required
 def cluster_communications(request, cluster_id):
     return render(request, 'cluster_communications.html', {'cluster_id': cluster_id})
 
@@ -358,12 +395,13 @@ def profile(request):
 def user_details(request):
     user = request.user
     try:
-        profile = UserProfile.objects.get(user=user)
-        subscription = profile.get_subscription_display()  # Obtenim el valor llegible de la subscripció
-    except UserProfile.DoesNotExist:
-        subscription = 'Free'  # Per defecte si el perfil no existeix
+        profile, created = UserProfile.objects.get_or_create(user=user)
+        subscription = profile.get_subscription_display()
+    except Exception:
+        subscription = 'Free'
 
     return render(request, 'user_details.html', {
         'user': user,
-        'subscription': subscription,  # Pasem el valor llegible de la subscripció a la plantilla
+        'subscription': subscription,
+        'profile': profile if 'profile' in locals() else None,
     })

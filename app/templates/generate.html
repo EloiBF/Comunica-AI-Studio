@@ -6,55 +6,125 @@
 <!-- Page header -->
 <div class="page-header">
     <h1 class="page-title">Generador de Comunicacions</h1>
-    <p class="page-subtitle">Genera comunicacions professionals de manera ràpida i senzilla, personalitzant-les a partir de prompts i plantilles</p>
+    <p class="page-subtitle">Genera comunicacions professionals amb IA</p>
+</div>
+
+<!-- Generated Communications -->
+<div class="block">
+    <div class="block-title">
+        <div class="block-number success">1</div>
+        <h2>Comunicacions Generades</h2>
+    </div>
+    <div class="block-content">
+        {% if generated_metadata %}
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Comunicació</th>
+                            <th class="th-hidden-mobile">Prompt</th>
+                            <th>Plantilla</th>
+                            <th class="th-hidden-mobile">Data</th>
+                            <th>Accions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for meta in generated_metadata %}
+                        <tr>
+                            <td>
+                                <div class="table-cell-main">
+                                    <div class="cell-title">{{ meta.name }}</div>
+                                    <div class="cell-subtitle visible-mobile">
+                                        {{ meta.created_at|date:"d/m/Y H:i" }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="td-hidden-mobile">
+                                <div class="table-cell-text" title="{{ meta.prompt }}">
+                                    {{ meta.prompt|truncatechars:80 }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="table-badge table-badge-secondary">
+                                    {{ meta.template|cut:".html"|title }}
+                                </span>
+                            </td>
+                            <td class="td-hidden-mobile">
+                                <time class="table-cell-date">
+                                    {{ meta.created_at|date:"d/m/Y H:i" }}
+                                </time>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a href="/generated/{{ meta.filename }}" target="_blank" 
+                                       class="table-btn table-btn-view" title="Veure comunicació">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                            <circle cx="12" cy="12" r="3"/>
+                                        </svg>
+                                    </a>
+                                    <form method="post" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="filename" value="{{ meta.filename }}">
+                                        <button type="submit" class="table-btn table-btn-delete" 
+                                                title="Eliminar comunicació" 
+                                                onclick="return confirm('Estàs segur que vols eliminar aquesta comunicació?')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M3 6h18"/>
+                                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                                <line x1="10" y1="11" x2="10" y2="17"/>
+                                                <line x1="14" y1="11" x2="14" y2="17"/>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--gray-400)">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                </div>
+                <h3 class="empty-state-title">Encara no tens comunicacions generades</h3>
+                <p class="empty-state-text">Utilitza el formulari de sota per crear la teva primera comunicació amb IA</p>
+            </div>
+        {% endif %}
+    </div>
 </div>
 
 <!-- Generator Form -->
 <div class="block">
     <div class="block-title">
-        <div class="block-number">1</div>
+        <div class="block-number">2</div>
         <h2>Nova Comunicació</h2>
     </div>
     <div class="block-content">
-        <form method="POST" id="generate-form" class="form-flow">
+        <form method="POST" id="generate-form" class="form-visual">
             {% csrf_token %}
             
-            <!-- Step 1: Basic Information -->
-            <div class="form-step">
-                <div class="step-header">
-                    <div class="step-number">1</div>
-                    <div class="step-info">
-                        <h3>Informació bàsica</h3>
-                        <p>Començarem amb el nom i tipus de comunicació</p>
-                    </div>
-                </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="name" class="form-label form-label-with-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="form-label-icon">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                                <polyline points="14,2 14,8 20,8"/>
-                            </svg>
-                            Nom de la comunicació
-                        </label>
-                        <input type="text" id="name" name="name" class="form-input" required 
-                               placeholder="Ex: Oferta especial Black Friday, Newsletter setmanal...">
-                        <div class="form-help">Aquest nom t'ajudarà a identificar la comunicació més endavant</div>
-                    </div>
+            <!-- Name field -->
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="name" class="form-label">Nom de la comunicació</label>
+                    <input type="text" id="name" name="name" class="form-input" required 
+                           placeholder="Ex: Oferta Black Friday, Newsletter desembre...">
                 </div>
             </div>
 
-            <!-- Step 2: Template Selection -->
-            <div class="form-step">
-                <div class="step-header">
-                    <div class="step-number">2</div>
-                    <div class="step-info">
-                        <h3>Selecciona una plantilla</h3>
-                        <p>Tria el tipus de comunicació que vols crear</p>
-                    </div>
-                </div>
-                
+            <!-- Template Selection -->
+            <div class="form-section">
+                <label class="form-label">Selecciona el tipus de comunicació</label>
                 <div class="template-selector">
                     <input type="hidden" id="template" name="template" required>
                     <div class="template-grid">
@@ -112,38 +182,60 @@
                 </div>
             </div>
 
-            <!-- Step 3: Content Description -->
-            <div class="form-step">
-                <div class="step-header">
-                    <div class="step-number">3</div>
-                    <div class="step-info">
-                        <h3>Descriu el contingut</h3>
-                        <p>Explica què vols comunicar i com ho vols enfocar</p>
-                    </div>
+            <!-- Content Description -->
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="prompt" class="form-label">Què vols comunicar?</label>
+                    <textarea id="prompt" name="prompt" class="form-textarea" rows="4" required 
+                              placeholder="Descriu breument què vols comunicar, a qui va dirigit i el to que vols utilitzar.&#10;&#10;Exemple: Promocionar descompte 20% en productes d'hivern per clients habituals, to amigable i urgent, oferta fins diumenge."></textarea>
+                </div>
+            </div>
+
+            <!-- Premium Options (Disabled) -->
+            <div class="form-section premium-section-disabled">
+                <div class="premium-header">
+                    <h3 class="form-section-title">
+                        Segmentació d'audiència 
+                        <span class="premium-badge">Premium</span>
+                    </h3>
+                    <p class="form-section-subtitle">Personalitza la comunicació per segments específics de clients</p>
                 </div>
                 
-                <div class="form-group">
-                    <label for="prompt" class="form-label form-label-with-icon">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="form-label-icon">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                        </svg>
-                        Contingut a generar
-                    </label>
-                    <textarea id="prompt" name="prompt" class="form-textarea" rows="5" required 
-                              placeholder="Descriu detalls específics del que vols comunicar:&#10;&#10;• Quin és l'objectiu principal?&#10;• A qui va dirigit?&#10;• Quin to vols utilitzar?&#10;• Quins detalls específics cal incloure?&#10;&#10;Exemple: 'Vull promocionar una oferta de descompte del 20% en tots els productes d'hivern. Va dirigit a clients habituals amb un to amigable i urgent. Cal destacar que l'oferta és limitada fins diumenge.'"></textarea>
-                    <div class="form-help">Sigues específic per obtenir millors resultats. Inclou detalls sobre el to, l'audiència i els punts clau a destacar.</div>
+                <div class="form-grid disabled">
+                    <div class="form-group">
+                        <label for="dataset" class="form-label">Dataset de clients</label>
+                        <select name="dataset" id="dataset" class="form-select" disabled>
+                            <option value="">Actualitza a Premium per accedir</option>
+                        </select>
+                        <div class="form-help">Segmenta els teus clients per crear missatges més personalitzats</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cluster" class="form-label">Segment específic</label>
+                        <select name="cluster" id="cluster" class="form-select" disabled>
+                            <option value="">Actualitza a Premium per accedir</option>
+                        </select>
+                        <div class="form-help">Dirigeix la comunicació a un segment concret</div>
+                    </div>
+                </div>
+
+                <div class="upgrade-prompt">
+                    <div class="upgrade-icon">⭐</div>
+                    <div class="upgrade-text">
+                        <strong>Actualitza a Premium</strong> per accedir a la segmentació avançada de clients i personalització de missatges
+                    </div>
+                    <a href="#" class="btn btn-warning btn-sm">Actualitzar</a>
                 </div>
             </div>
         </form>
     </div>
+    
     <div class="block-actions">
         <button type="reset" form="generate-form" class="btn btn-secondary">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3 6h18l-1.5 12a2 2 0 0 1-2 1.84H6.5a2 2 0 0 1-2-1.84L3 6ZM8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                <line x1="10" y1="11" x2="10" y2="17"/>
-                <line x1="14" y1="11" x2="14" y2="17"/>
             </svg>
-            Netejar formulari
+            Netejar
         </button>
         <button type="submit" form="generate-form" class="btn btn-primary btn-lg">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -155,111 +247,238 @@
     </div>
 </div>
 
-<!-- Generated Communications -->
-<div class="block">
-    <div class="block-title">
-        <div class="block-number success">2</div>
-        <h2>Comunicacions Generades</h2>
-    </div>
-    <div class="block-content">
-        {% if generated_metadata %}
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Comunicació</th>
-                            <th class="th-hidden-mobile">Prompt</th>
-                            <th>Plantilla</th>
-                            <th class="th-hidden-mobile">Segmentació</th>
-                            <th class="th-hidden-mobile">Data</th>
-                            <th>Accions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for meta in generated_metadata %}
-                        <tr>
-                            <td>
-                                <div class="table-cell-main">
-                                    <div class="cell-title">{{ meta.name }}</div>
-                                    <div class="cell-subtitle visible-mobile">
-                                        {{ meta.created_at|date:"d/m/Y H:i" }}
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="td-hidden-mobile">
-                                <div class="table-cell-text" title="{{ meta.prompt }}">
-                                    {{ meta.prompt|truncatechars:80 }}
-                                </div>
-                            </td>
-                            <td>
-                                <span class="table-badge table-badge-secondary">
-                                    {{ meta.template|cut:".html"|title }}
-                                </span>
-                            </td>
-                            <td class="td-hidden-mobile">
-                                <div class="table-cell-group">
-                                    {% if meta.dataset %}
-                                        <span class="table-badge table-badge-info">{{ meta.dataset|title }}</span>
-                                        {% if meta.cluster %}
-                                            <span class="table-badge table-badge-primary">{{ meta.cluster }}</span>
-                                        {% endif %}
-                                    {% else %}
-                                        <span class="table-text-muted">General</span>
-                                    {% endif %}
-                                </div>
-                            </td>
-                            <td class="td-hidden-mobile">
-                                <time class="table-cell-date">
-                                    {{ meta.created_at|date:"d/m/Y H:i" }}
-                                </time>
-                            </td>
-                            <td>
-                                <div class="table-actions">
-                                    <a href="/generated/{{ meta.filename }}" target="_blank" 
-                                       class="table-btn table-btn-view" title="Veure comunicació">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                            <circle cx="12" cy="12" r="3"/>
-                                        </svg>
-                                    </a>
-                                    <form method="post" style="display: inline;">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="delete">
-                                        <input type="hidden" name="filename" value="{{ meta.filename }}">
-                                        <button type="submit" class="table-btn table-btn-delete" 
-                                                title="Eliminar comunicació" 
-                                                onclick="return confirm('Estàs segur que vols eliminar aquesta comunicació?')">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M3 6h18"/>
-                                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-                                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                                                <line x1="10" y1="11" x2="10" y2="17"/>
-                                                <line x1="14" y1="11" x2="14" y2="17"/>
-                                            </svg>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--gray-400)">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                        <polyline points="14,2 14,8 20,8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                    </svg>
-                </div>
-                <h3 class="empty-state-title">Encara no tens comunicacions generades</h3>
-                <p class="empty-state-text">Utilitza el formulari de dalt per crear la teva primera comunicació amb IA</p>
-            </div>
-        {% endif %}
-    </div>
-</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const templateCards = document.querySelectorAll('.template-card');
+    const templateInput = document.getElementById('template');
 
+    // Template selector functionality
+    templateCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove selected class from all cards
+            templateCards.forEach(c => c.classList.remove('selected'));
+            
+            // Add selected class to clicked card
+            this.classList.add('selected');
+            
+            // Set the hidden input value
+            templateInput.value = this.dataset.template;
+        });
+    });
+});
+</script>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Form visual styles */
+.form-visual {
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+}
+
+.form-section {
+    margin-bottom: var(--space-8);
+}
+
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
+.form-section-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: var(--space-2);
+    display: flex;
+    align-items: center;
+}
+
+.form-section-subtitle {
+    color: var(--gray-600);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-4);
+}
+
+.form-group {
+    margin-bottom: var(--space-4);
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: var(--space-2);
+    font-size: var(--font-size-sm);
+}
+
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: var(--space-3);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Template selector */
+.template-selector {
+    margin-top: var(--space-4);
+}
+
+
+.template-card {
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.template-card:hover {
+    border-color: var(--primary-300);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.template-card.selected {
+    border-color: var(--primary-500);
+    background: var(--primary-50);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.template-icon {
+    font-size: 2rem;
+    margin-bottom: var(--space-2);
+}
+
+.template-card h3 {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: var(--space-1);
+}
+
+.template-card p {
+    font-size: var(--font-size-xs);
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Premium section (disabled) */
+.premium-section-disabled {
+    position: relative;
+    opacity: 0.6;
+}
+
+.premium-header {
+    margin-bottom: var(--space-4);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+}
+
+.form-grid.disabled {
+    pointer-events: none;
+}
+
+.form-help {
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+    margin-top: var(--space-1);
+}
+
+.upgrade-prompt {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    background: var(--warning-50);
+    border: 1px solid var(--warning-200);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-top: var(--space-4);
+}
+
+.upgrade-icon {
+    font-size: 1.5rem;
+    color: var(--warning-600);
+}
+
+.upgrade-text {
+    flex: 1;
+    font-size: var(--font-size-sm);
+    color: var(--gray-700);
+}
+
+/* Premium badge */
+.premium-badge {
+    background: linear-gradient(135deg, var(--warning-500), var(--warning-600));
+    color: white;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    margin-left: var(--space-2);
+}
+
+/* Block actions */
+.block-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--gray-200);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .block-actions {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    
+    .btn {
+        width: 100%;
+    }
+    
+    .upgrade-prompt {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--space-2);
+    }
+}
+
+@media (max-width: 480px) {
+    
+    .form-visual {
+        padding: var(--space-4);
+    }
+}
+</style>
 {% endblock %}

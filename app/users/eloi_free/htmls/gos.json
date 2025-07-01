@@ -1,0 +1,8 @@
+{
+    "name": "Gos",
+    "prompt": "Comunicació de venta de productes per gossos",
+    "template": "sale.html",
+    "dataset": null,
+    "cluster": null,
+    "created_at": "2025-07-01T11:25:54.893907+00:00"
+}

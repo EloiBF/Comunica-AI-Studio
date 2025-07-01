@@ -8,7 +8,7 @@ base_dir = Path(__file__).resolve().parent.parent.parent  # Aquí, puja un nivel
 sys.path.append(str(base_dir))
 
 # Importem funcions necessàries
-from app.scripts.utils import prompt_AI
+from app.scripts.utils import prompt_AI, get_user_folder_path
 
 
 def generar_prompt_clusters(cluster_summary: dict) -> str:

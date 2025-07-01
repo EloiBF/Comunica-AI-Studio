@@ -10,7 +10,7 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import RobustScaler
 from kneed import KneeLocator
 from sklearn.metrics import silhouette_score
-
+import shutil
 # Definim entorn on s'executarà aquest script (com si fos el root)
 base_dir = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(base_dir))
@@ -99,7 +99,6 @@ def get_table_info(username, table_name):
         'sample_data': sample_text,
         'columns_info': columns_info
     }
-
 def generate_clustering_table_sql(username, original_table_name):
     """
     Genera SQL amb IA per crear una taula de clustering modificada
@@ -109,7 +108,7 @@ def generate_clustering_table_sql(username, original_table_name):
     clustering_table_name = f"{original_table_name}_clustering"
 
     prompt = f"""
-Ets un expert en SQL i análisis de dades. 
+Ets un expert en SQL i anàlisi de dades. 
 
 Tens una taula anomenada '{original_table_name}' amb les següents columnes:
 {table_info['headers_text']}
@@ -118,7 +117,7 @@ Mostra de dades:
 {table_info['sample_data']}
 
 Genera una sentència SQL CREATE TABLE per crear una nova taula anomenada '{clustering_table_name}' 
-que contingui NOMÉS les columnes més rellevants per fer clustering (análisis de segments).
+que contingui NOMÉS les columnes més rellevants per fer clustering (anàlisi de segments).
 
 Regles:
 1. Selecciona només columnes numèriques o categòriques útils per clustering
@@ -135,7 +134,9 @@ Retorna només la sentència SQL:
     # Netejar la resposta
     sql_clean = re.search(r'CREATE TABLE.*?;', sql_response, re.DOTALL | re.IGNORECASE)
     if sql_clean:
-        return sql_clean.group(0).strip()
+        # Afegir SQL per eliminar la taula si ja existeix
+        drop_table_sql = f"DROP TABLE IF EXISTS {clustering_table_name};"
+        return f"{drop_table_sql}\n{sql_clean.group(0).strip()}"
     else:
         raise ValueError("No s'ha pogut generar SQL vàlid")
 
@@ -446,7 +447,7 @@ def full_clustering_pipeline(file_path, username, n_clusters=0):
         if df is None:
             raise Exception("Error carregant dades de clustering")
 
-        # 5. Realizar clustering
+        # 5. Realitzar clustering
         print("\n🎯 Pas 5: Executant clustering...")
         df_clustered, n_clusters_used = perform_clustering(df, n_clusters)
 
@@ -460,6 +461,12 @@ def full_clustering_pipeline(file_path, username, n_clusters=0):
 
         print(f"\n🎉 Pipeline completat exitosament!")
         print(f"📄 Resum guardat a: {json_path}")
+
+        # Esborrar fitxers pujats
+        user_data_dir = os.path.join('app', 'users', username, 'data_files')
+        if os.path.exists(user_data_dir):
+            shutil.rmtree(user_data_dir)
+            print(f"🗑️ Els fitxers pujats han estat esborrats correctament.")
 
         return cluster_summary, json_path
 
