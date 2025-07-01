@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anunci Important</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background-color: #f8f4ff;
+            color: #333;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-top: 8px solid #8b5cf6;
+        }
+
+        .announcement-header {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .announcement-header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .announcement-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+
+        .highlight-box {
+            background-color: #f3f4f6;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            border-left: 4px solid #8b5cf6;
+        }
+
+        .impact-section {
+            background-color: #ede9fe;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .impact-section h3 {
+            color: #7c3aed;
+            margin-bottom: 1rem;
+        }
+
+        .timeline {
+            background-color: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .timeline h3 {
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+
+        .more-info-button {
+            background-color: #8b5cf6;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            margin: 1rem auto;
+            text-align: center;
+            width: 200px;
+        }
+
+        .footer {
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            color: #777;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="announcement-header">
+            <h1>[announcement_title]</h1>
+            <p>[announcement_subtitle]</p>
+        </div>
+
+        <p style="font-size: 1.1rem; line-height: 1.6;">[announcement_message]</p>
+
+        <div class="highlight-box">
+            <h3 style="color: #374151; margin-bottom: 1rem;">🌟 Punts clau:</h3>
+            <p style="margin: 0;">[key_points]</p>
+        </div>
+
+        <div class="impact-section">
+            <h3>Com t'afecta a tu:</h3>
+            <p style="margin: 0; color: #4b5563;">[impact_description]</p>
+        </div>
+
+        <div class="timeline">
+            <h3>Cronograma:</h3>
+            <ul style="color: #6b7280; line-height: 1.6; margin: 0;">
+                <li>[timeline_step_1]</li>
+                <li>[timeline_step_2]</li>
+                <li>[timeline_step_3]</li>
+            </ul>
+        </div>
+
+        <p>[additional_info]</p>
+
+        <div style="text-align: center;">
+            <a href="[more_info_url]" class="more-info-button">[more_info_text]</a>
+        </div>
+
+        <div class="footer">
+            Per més detalls o preguntes, contacta amb nosaltres a [contact_email]
+        </div>
+    </div>
+</body>
+</html>

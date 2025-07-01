@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunicació Estacional</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background: linear-gradient(135deg, [primary_color] 0%, [secondary_color] 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .seasonal-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, [primary_color], [secondary_color]);
+            color: white;
+            border-radius: 12px;
+        }
+
+        .seasonal-header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .seasonal-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background-color: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid [accent_color];
+        }
+
+        .feature-card h3 {
+            color: [primary_color];
+            margin-bottom: 1rem;
+        }
+
+        .celebration-message {
+            background-color: [light_color];
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            text-align: center;
+            border: 3px solid [accent_color];
+        }
+
+        .seasonal-button {
+            background: linear-gradient(135deg, [primary_color], [secondary_color]);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            margin: 1rem auto;
+            text-align: center;
+            width: 250px;
+        }
+
+        .footer {
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="seasonal-header">
+            <div class="seasonal-icon">[seasonal_icon]</div>
+            <h1>[seasonal_title]</h1>
+            <p style="margin: 0; font-size: 1.2rem; opacity: 0.9;">[seasonal_subtitle]</p>
+        </div>
+
+        <p style="font-size: 1.2rem; line-height: 1.6; text-align: center;">[seasonal_message]</p>
+
+        <div class="celebration-message">
+            <h2 style="color: [primary_color]; margin-bottom: 1rem;">[celebration_title]</h2>
+            <p style="margin: 0; font-size: 1.1rem;">[celebration_message]</p>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>[feature_1_title]</h3>
+                <p>[feature_1_description]</p>
+            </div>
+            <div class="feature-card">
+                <h3>[feature_2_title]</h3>
+                <p>[feature_2_description]</p>
+            </div>
+            <div class="feature-card">
+                <h3>[feature_3_title]</h3>
+                <p>[feature_3_description]</p>
+            </div>
+        </div>
+
+        <p style="text-align: center; font-size: 1.1rem;">[special_offer_message]</p>
+
+        <div style="text-align: center;">
+            <a href="[cta_url]" class="seasonal-button">[cta_text]</a>
+        </div>
+
+        <div class="footer">
+            [closing_message] - Equip de [company_name]
+        </div>
+    </div>
+</body>
+</html>

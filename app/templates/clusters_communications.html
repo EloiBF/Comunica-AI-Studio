@@ -1,7 +1,157 @@
-{# cluster_communications.html #}
-{% extends 'base.html' %}
-{% block title %}Comunicacions per Cluster{% endblock %}
+
+{% extends 'base_authenticated.html' %}
+
+{% block title %}Comunicacions per Cluster - Comunica AI Studio{% endblock %}
+
 {% block content %}
-<h1>Comunicacions del cluster</h1>
-<!-- Llista de comunicacions generades per aquest cluster -->
+<!-- Page header -->
+<div class="page-header">
+    <h1 class="page-title">Comunicacions per Cluster</h1>
+    <p class="page-subtitle">Crea contingut personalitzat per al segment de clients seleccionat</p>
+</div>
+
+<!-- Info banner -->
+<div class="info-banner">
+    <div class="info-banner-content">
+        <svg class="info-banner-icon" width="20" height="20" viewBox="0 0 24 24" fill="var(--primary-600)">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+        </svg>
+        <div>
+            <h3 class="info-banner-title">Comunicació segmentada</h3>
+            <p class="info-banner-text">La IA utilitzarà les característiques específiques d'aquest cluster per generar contingut més rellevant i personalitzat.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Cluster Information -->
+<div class="block">
+    <div class="block-title">
+        <div class="block-number">1</div>
+        <h2>Informació del cluster</h2>
+    </div>
+    <div class="block-content">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+            <div style="text-align: center; padding: var(--space-4); background: linear-gradient(135deg, var(--primary-50), var(--primary-100)); border-radius: var(--radius-lg); border: 1px solid var(--primary-200);">
+                <div style="font-size: var(--font-size-xl); font-weight: 700; color: var(--primary-700); margin-bottom: var(--space-1);">Cluster {{ cluster_id|default:"1" }}</div>
+                <div style="color: var(--primary-600); font-weight: 600; font-size: var(--font-size-sm);">Segment seleccionat</div>
+            </div>
+            
+            <div style="text-align: center; padding: var(--space-4); background: linear-gradient(135deg, var(--success-50), var(--success-100)); border-radius: var(--radius-lg); border: 1px solid var(--success-200);">
+                <div style="font-size: var(--font-size-xl); font-weight: 700; color: var(--success-700); margin-bottom: var(--space-1);">25%</div>
+                <div style="color: var(--success-600); font-weight: 600; font-size: var(--font-size-sm);">Dels clients</div>
+            </div>
+            
+            <div style="text-align: center; padding: var(--space-4); background: linear-gradient(135deg, var(--warning-50), var(--warning-100)); border-radius: var(--radius-lg); border: 1px solid var(--warning-200);">
+                <div style="font-size: var(--font-size-xl); font-weight: 700; color: var(--warning-700); margin-bottom: var(--space-1);">1,250</div>
+                <div style="color: var(--warning-600); font-weight: 600; font-size: var(--font-size-sm);">Clients totals</div>
+            </div>
+        </div>
+
+        <div style="padding: var(--space-4); background: var(--gray-50); border-radius: var(--radius-md); border: 1px solid var(--gray-200);">
+            <h3 style="margin: 0 0 var(--space-2) 0; color: var(--gray-900); font-weight: 600;">Característiques principals</h3>
+            <ul style="margin: 0; color: var(--gray-700); line-height: 1.6;">
+                <li>Clients amb alta freqüència de compra</li>
+                <li>Prefereixen productes premium</li>
+                <li>Edat mitjana: 35-45 anys</li>
+                <li>Alt nivell d'engagement amb emails</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Generate Communication Form -->
+<div class="block">
+    <div class="block-title">
+        <div class="block-number success">2</div>
+        <h2>Generar comunicació</h2>
+    </div>
+    <div class="block-content">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="cluster_id" value="{{ cluster_id }}">
+            
+            <div class="form-group">
+                <label for="prompt" class="form-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    Què vols comunicar a aquest segment?
+                </label>
+                <textarea 
+                    id="prompt" 
+                    name="prompt" 
+                    class="form-textarea"
+                    rows="4"
+                    placeholder="Descriu el missatge que vols transmetre als clients d'aquest cluster. La IA adaptarà el contingut a les seves característiques específiques..."
+                    required
+                ></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="template_name" class="form-label">Tipus de comunicació</label>
+                <select id="template_name" name="template_name" class="form-input">
+                    <option value="sale.html">Oferta especial</option>
+                    <option value="tips.html">Tips i consells</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="communication_name" class="form-label">Nom de la comunicació</label>
+                <input 
+                    type="text" 
+                    id="communication_name" 
+                    name="communication_name" 
+                    class="form-input"
+                    placeholder="Ex: Oferta exclusiva Cluster 1"
+                    required
+                >
+            </div>
+        </form>
+    </div>
+    <div class="block-actions">
+        <a href="/clusters/" class="btn btn-secondary">Tornar als clusters</a>
+        <button type="submit" form="cluster-comm-form" class="btn btn-primary btn-lg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: var(--space-1);">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            Generar comunicació
+        </button>
+    </div>
+</div>
+
+<!-- Previous Communications for this Cluster -->
+<div class="block">
+    <div class="block-title">
+        <div class="block-number warning">3</div>
+        <h2>Comunicacions anteriors</h2>
+    </div>
+    <div class="block-content">
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--gray-400)">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14,2 14,8 20,8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+            </div>
+            <h3 class="empty-state-title">Encara no hi ha comunicacions per aquest cluster</h3>
+            <p class="empty-state-text">Crea la primera comunicació personalitzada per aquest segment de clients</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Afegir l'id al formulari per poder-lo referenciar des del botó
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[method="post"]');
+    if (form && !form.hasAttribute('id')) {
+        form.setAttribute('id', 'cluster-comm-form');
+    }
+});
+</script>
 {% endblock %}

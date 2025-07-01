@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gràcies</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .thank-you-icon {
+            width: 80px;
+            height: 80px;
+            background-color: #10b981;
+            border-radius: 50%;
+            margin: 0 auto 2rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+
+        h1 {
+            color: #059669;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .main-message {
+            font-size: 1.3rem;
+            color: #374151;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .appreciation-box {
+            background-color: #ecfdf5;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border: 2px solid #10b981;
+        }
+
+        .next-steps {
+            background-color: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .contact-info {
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="thank-you-icon">✓</div>
+        
+        <h1>[thank_you_title]</h1>
+        
+        <p class="main-message">[thank_you_message]</p>
+
+        <div class="appreciation-box">
+            <h3 style="color: #059669; margin-bottom: 1rem;">[appreciation_title]</h3>
+            <p style="margin: 0; color: #374151;">[appreciation_message]</p>
+        </div>
+
+        <div class="next-steps">
+            <h3 style="color: #374151; margin-bottom: 1rem;">Següents passos:</h3>
+            <ul style="color: #6b7280; line-height: 1.6; margin: 0;">
+                <li>[next_step_1]</li>
+                <li>[next_step_2]</li>
+                <li>[next_step_3]</li>
+            </ul>
+        </div>
+
+        <p>[closing_message]</p>
+
+        <div class="contact-info">
+            <strong>Necessites ajuda?</strong><br>
+            Contacta'ns a [contact_email] o visita [website_url]
+        </div>
+    </div>
+</body>
+</html>

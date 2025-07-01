@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esdeveniment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background-color: #fef3c7;
+            color: #333;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 3px solid #f59e0b;
+        }
+
+        h1 {
+            color: #d97706;
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .event-banner {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .event-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .detail-box {
+            background-color: #fef3c7;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #fbbf24;
+        }
+
+        .detail-box h3 {
+            color: #d97706;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .detail-box p {
+            font-weight: bold;
+            color: #92400e;
+            margin: 0;
+        }
+
+        .register-button {
+            background-color: #d97706;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            margin: 2rem auto;
+            text-align: center;
+            width: 250px;
+        }
+
+        .footer {
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>[event_title]</h1>
+        
+        <div class="event-banner">
+            <h2 style="margin: 0; font-size: 1.5rem;">[event_subtitle]</h2>
+        </div>
+
+        <p style="font-size: 1.1rem; line-height: 1.6;">[event_description]</p>
+
+        <div class="event-details">
+            <div class="detail-box">
+                <h3>Data</h3>
+                <p>[event_date]</p>
+            </div>
+            <div class="detail-box">
+                <h3>Hora</h3>
+                <p>[event_time]</p>
+            </div>
+            <div class="detail-box">
+                <h3>Lloc</h3>
+                <p>[event_location]</p>
+            </div>
+            <div class="detail-box">
+                <h3>Durada</h3>
+                <p>[event_duration]</p>
+            </div>
+        </div>
+
+        <p>[event_highlights]</p>
+
+        <div style="text-align: center;">
+            <a href="[register_url]" class="register-button">[register_text]</a>
+        </div>
+
+        <div class="footer">
+            Places limitades. Registra't aviat per assegurar la teva participació!
+        </div>
+    </div>
+</body>
+</html>

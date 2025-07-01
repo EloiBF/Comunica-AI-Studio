@@ -1,246 +1,176 @@
-
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}Registra't - Comunica AI Studio{% endblock %}
-{% block description %}Crea el teu compte gratuït a Comunica AI Studio i comença a generar comunicacions intel·ligents avui mateix.{% endblock %}
 
 {% block content %}
-<div style="max-width: 520px; margin: 0 auto; padding: var(--space-8) var(--space-6);">
-    <!-- Header -->
-    <header class="text-center mb-8">
-        <h1 style="font-size: var(--font-size-3xl); font-weight: 700; color: var(--gray-900); margin-bottom: var(--space-4);">
-            Crea el teu compte
-        </h1>
-        <p style="color: var(--gray-600); font-size: var(--font-size-lg);">
-            Comença a generar comunicacions intel·ligents en pocs minuts
-        </p>
-    </header>
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1>Uneix-te a Comunica AI Studio</h1>
+        <p class="hero-description">Crea el teu compte gratuït i comença a generar comunicacions personalitzades amb intel·ligència artificial</p>
+    </div>
+</section>
 
-    <!-- Signup form -->
-    <div class="card">
-        <div class="card-content">
-            <form method="post" novalidate>
-                {% csrf_token %}
-                
-                <!-- Username field -->
-                <div class="form-group">
-                    <label for="{{ form.username.id_for_label }}" class="form-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                        Nom d'usuari
-                    </label>
-                    <input 
-                        type="text" 
-                        name="{{ form.username.name }}" 
-                        id="{{ form.username.id_for_label }}"
-                        class="form-input {% if form.username.errors %}border-error-500{% endif %}"
-                        value="{{ form.username.value|default:'' }}"
-                        required
-                        autofocus
-                        autocomplete="username"
-                        aria-describedby="{% if form.username.errors %}username-error{% endif %} username-help"
-                        placeholder="El teu nom d'usuari únic"
-                    >
-                    <small id="username-help" style="color: var(--gray-500); font-size: var(--font-size-xs); margin-top: var(--space-1); display: block;">
-                        Mínim 3 caràcters, només lletres, números i guions baixos
-                    </small>
-                    {% if form.username.errors %}
-                        <div id="username-error" class="text-error-600 mt-1" style="font-size: var(--font-size-sm);">
-                            {{ form.username.errors.0 }}
-                        </div>
-                    {% endif %}
+<!-- Registration Form -->
+<div class="block">
+    <div class="block-title">
+        <div class="block-number">1</div>
+        <h2>Crea el teu compte</h2>
+    </div>
+    <div class="block-content">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="username" class="form-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Nom d'usuari
+                </label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    class="form-input"
+                    placeholder="Introdueix el teu nom d'usuari"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    Correu electrònic
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-input"
+                    placeholder="Introdueix el teu email"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password1" class="form-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <circle cx="12" cy="16" r="1"/>
+                        <path d="m12 13 0 2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    Contrasenya
+                </label>
+                <input 
+                    type="password" 
+                    id="password1" 
+                    name="password1" 
+                    class="form-input"
+                    placeholder="Crea una contrasenya segura"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password2" class="form-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <circle cx="12" cy="16" r="1"/>
+                        <path d="m12 13 0 2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    Confirma la contrasenya
+                </label>
+                <input 
+                    type="password" 
+                    id="password2" 
+                    name="password2" 
+                    class="form-input"
+                    placeholder="Repeteix la contrasenya"
+                    required
+                >
+            </div>
+        </form>
+    </div>
+    <div class="block-actions">
+        <a href="/login/" class="btn btn-secondary">Ja tinc compte</a>
+        <button type="submit" form="signup-form" class="btn btn-primary btn-lg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: var(--space-1);">
+                <path d="M13 3l3.293 3.293-7 7 1.414 1.414 7-7L21 11V3z"/>
+                <path d="M19 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"/>
+            </svg>
+            Crear compte
+        </button>
+    </div>
+</div>
+
+<!-- Benefits Section -->
+<div class="block">
+    <div class="block-title">
+        <div class="block-number success">2</div>
+        <h2>Què obtindràs amb el teu compte</h2>
+    </div>
+    <div class="block-content">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-6);">
+            <div style="display: flex; align-items: center; gap: var(--space-4);">
+                <div style="background: var(--primary-100); width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--primary-700);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
                 </div>
-
-                <!-- Email field -->
-                <div class="form-group">
-                    <label for="{{ form.email.id_for_label }}" class="form-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                            <polyline points="22,6 12,13 2,6"/>
-                        </svg>
-                        Correu electrònic
-                    </label>
-                    <input 
-                        type="email" 
-                        name="{{ form.email.name }}" 
-                        id="{{ form.email.id_for_label }}"
-                        class="form-input {% if form.email.errors %}border-error-500{% endif %}"
-                        value="{{ form.email.value|default:'' }}"
-                        required
-                        autocomplete="email"
-                        aria-describedby="{% if form.email.errors %}email-error{% endif %}"
-                        placeholder="nom@exemple.com"
-                    >
-                    {% if form.email.errors %}
-                        <div id="email-error" class="text-error-600 mt-1" style="font-size: var(--font-size-sm);">
-                            {{ form.email.errors.0 }}
-                        </div>
-                    {% endif %}
+                <div>
+                    <h3 style="color: var(--gray-900); margin: 0; font-weight: 600;">Generació il·limitada</h3>
+                    <p style="color: var(--gray-600); margin: 0; font-size: var(--font-size-sm);">Crea tantes comunicacions com necessitis</p>
                 </div>
+            </div>
 
-                <!-- Password field -->
-                <div class="form-group">
-                    <label for="{{ form.password1.id_for_label }}" class="form-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                        </svg>
-                        Contrasenya
-                    </label>
-                    <input 
-                        type="password" 
-                        name="{{ form.password1.name }}" 
-                        id="{{ form.password1.id_for_label }}"
-                        class="form-input {% if form.password1.errors %}border-error-500{% endif %}"
-                        required
-                        autocomplete="new-password"
-                        aria-describedby="{% if form.password1.errors %}password1-error{% endif %} password-help"
-                        placeholder="Mínim 8 caràcters"
-                    >
-                    <small id="password-help" style="color: var(--gray-500); font-size: var(--font-size-xs); margin-top: var(--space-1); display: block;">
-                        Mínim 8 caràcters amb lletres i números
-                    </small>
-                    {% if form.password1.errors %}
-                        <div id="password1-error" class="text-error-600 mt-1" style="font-size: var(--font-size-sm);">
-                            {{ form.password1.errors.0 }}
-                        </div>
-                    {% endif %}
+            <div style="display: flex; align-items: center; gap: var(--space-4);">
+                <div style="background: var(--success-100); width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--success-700);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="12" cy="12" r="3"/>
+                        <circle cx="12" cy="5" r="2"/>
+                        <circle cx="12" cy="19" r="2"/>
+                        <circle cx="5" cy="12" r="2"/>
+                        <circle cx="19" cy="12" r="2"/>
+                    </svg>
                 </div>
-
-                <!-- Password confirmation field -->
-                <div class="form-group">
-                    <label for="{{ form.password2.id_for_label }}" class="form-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                            <polyline points="9,12 11,14 15,10"/>
-                        </svg>
-                        Confirma la contrasenya
-                    </label>
-                    <input 
-                        type="password" 
-                        name="{{ form.password2.name }}" 
-                        id="{{ form.password2.id_for_label }}"
-                        class="form-input {% if form.password2.errors %}border-error-500{% endif %}"
-                        required
-                        autocomplete="new-password"
-                        aria-describedby="{% if form.password2.errors %}password2-error{% endif %}"
-                        placeholder="Repeteix la contrasenya"
-                    >
-                    {% if form.password2.errors %}
-                        <div id="password2-error" class="text-error-600 mt-1" style="font-size: var(--font-size-sm);">
-                            {{ form.password2.errors.0 }}
-                        </div>
-                    {% endif %}
+                <div>
+                    <h3 style="color: var(--gray-900); margin: 0; font-weight: 600;">Anàlisi de clusters</h3>
+                    <p style="color: var(--gray-600); margin: 0; font-size: var(--font-size-sm);">Segmenta els teus clients automàticament</p>
                 </div>
+            </div>
 
-                <!-- Terms acceptance -->
-                <div class="form-group">
-                    <label style="display: flex; align-items: flex-start; gap: var(--space-2); cursor: pointer; font-size: var(--font-size-sm); color: var(--gray-600);">
-                        <input type="checkbox" required style="margin-top: 2px; accent-color: var(--primary-600);">
-                        <span>
-                            Accepto els 
-                            <a href="#" style="color: var(--primary-600); text-decoration: none; font-weight: 500;">termes i condicions</a>
-                            i la 
-                            <a href="#" style="color: var(--primary-600); text-decoration: none; font-weight: 500;">política de privacitat</a>
-                        </span>
-                    </label>
-                </div>
-
-                <!-- Submit button -->
-                <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-bottom: var(--space-4);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: var(--space-2);">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <div style="display: flex; align-items: center; gap: var(--space-4);">
+                <div style="background: var(--warning-100); width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--warning-700);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                         <circle cx="9" cy="7" r="4"/>
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
                         <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                     </svg>
-                    Crear compte gratuït
-                </button>
-
-                <!-- Form errors -->
-                {% if form.non_field_errors %}
-                    <div class="alert alert-error" style="background: var(--error-50); border: 1px solid var(--error-200); color: var(--error-700); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-4);">
-                        {{ form.non_field_errors.0 }}
-                    </div>
-                {% endif %}
-            </form>
-        </div>
-    </div>
-
-    <!-- Login link -->
-    <div class="text-center mt-6">
-        <p style="color: var(--gray-600);">
-            Ja tens compte? 
-            <a href="/login/" style="color: var(--primary-600); text-decoration: none; font-weight: 500;">
-                Inicia sessió aquí
-            </a>
-        </p>
-    </div>
-
-    <!-- Features preview -->
-    <div style="margin-top: var(--space-12); text-align: center;">
-        <h3 style="color: var(--gray-800); margin-bottom: var(--space-6); font-size: var(--font-size-lg);">
-            Què podràs fer amb el teu compte:
-        </h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); text-align: left;">
-            <div style="display: flex; align-items: center; gap: var(--space-3);">
-                <div style="background: var(--primary-100); padding: var(--space-2); border-radius: var(--radius-md);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--primary-600)">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                        <polyline points="14,2 14,8 20,8"/>
-                    </svg>
                 </div>
-                <span style="color: var(--gray-700); font-size: var(--font-size-sm);">Genera comunicacions amb IA</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: var(--space-3);">
-                <div style="background: var(--success-100); padding: var(--space-2); border-radius: var(--radius-md);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--success-600)">
-                        <circle cx="12" cy="12" r="3"/>
-                        <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
-                    </svg>
+                <div>
+                    <h3 style="color: var(--gray-900); margin: 0; font-weight: 600;">Context personalitzat</h3>
+                    <p style="color: var(--gray-600); margin: 0; font-size: var(--font-size-sm);">Adapta la IA al teu negoci</p>
                 </div>
-                <span style="color: var(--gray-700); font-size: var(--font-size-sm);">Organitza per clústers</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: var(--space-3);">
-                <div style="background: var(--warning-100); padding: var(--space-2); border-radius: var(--radius-md);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--warning-600)">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polygon points="10,8 16,12 10,16 10,8"/>
-                    </svg>
-                </div>
-                <span style="color: var(--gray-700); font-size: var(--font-size-sm);">Context personalitzat</span>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_css %}
-<style>
-.border-error-500 {
-    border-color: var(--error-500) !important;
-}
-
-.text-error-600 {
-    color: var(--error-600);
-}
-
-.alert-error {
-    background: var(--error-50);
-    border: 1px solid var(--error-200);
-    color: var(--error-700);
-}
-
-.form-input:focus.border-error-500 {
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-}
-
-.mt-1 {
-    margin-top: var(--space-1);
-}
-</style>
+<script>
+// Afegir l'id al formulari per poder-lo referenciar des del botó
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[method="post"]');
+    if (form && !form.hasAttribute('id')) {
+        form.setAttribute('id', 'signup-form');
+    }
+});
+</script>
 {% endblock %}

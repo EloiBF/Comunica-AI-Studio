@@ -1,7 +1,183 @@
-{# profile.html #}
+
 {% extends 'base_authenticated.html' %}
-{% block title %}Perfil d'usuari{% endblock %}
+
+{% block title %}El meu perfil - Comunica AI Studio{% endblock %}
+
 {% block content %}
-<h1>Configuració del teu perfil</h1>
-<!-- Dades d'usuari i configuracions -->
+<!-- Page header -->
+<div class="page-header">
+    <h1 class="page-title">El meu perfil</h1>
+    <p class="page-subtitle">Gestiona la informació del teu compte i preferències</p>
+</div>
+
+<!-- Info banner -->
+<div class="info-banner">
+    <div class="info-banner-content">
+        <svg class="info-banner-icon" width="20" height="20" viewBox="0 0 24 24" fill="var(--primary-600)">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <div>
+            <h3 class="info-banner-title">Personalitza la teva experiència</h3>
+            <p class="info-banner-text">Actualitza les teves dades personals i configura les preferències per obtenir millors resultats amb la IA.</p>
+        </div>
+    </div>
+</div>
+
+<!-- User Information -->
+<div class="block">
+    <div class="block-title">
+        <div class="block-number">1</div>
+        <h2>Informació personal</h2>
+    </div>
+    <div class="block-content">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="username" class="form-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Nom d'usuari
+                </label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    class="form-input"
+                    value="{{ user.username }}"
+                    readonly
+                >
+                <div class="form-help">El nom d'usuari no es pot modificar</div>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--space-1);">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    Correu electrònic
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-input"
+                    value="{{ user.email }}"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="first_name" class="form-label">Nom</label>
+                <input 
+                    type="text" 
+                    id="first_name" 
+                    name="first_name" 
+                    class="form-input"
+                    value="{{ user.first_name }}"
+                    placeholder="El teu nom"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="last_name" class="form-label">Cognoms</label>
+                <input 
+                    type="text" 
+                    id="last_name" 
+                    name="last_name" 
+                    class="form-input"
+                    value="{{ user.last_name }}"
+                    placeholder="Els teus cognoms"
+                >
+            </div>
+        </form>
+    </div>
+    <div class="block-actions">
+        <button type="submit" form="profile-form" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: var(--space-1);">
+                <polyline points="20,6 9,17 4,12"/>
+            </svg>
+            Guardar canvis
+        </button>
+    </div>
+</div>
+
+<!-- Account Stats -->
+<div class="block">
+    <div class="block-title">
+        <div class="block-number success">2</div>
+        <h2>Estadístiques del compte</h2>
+    </div>
+    <div class="block-content">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-6);">
+            <div style="text-align: center; padding: var(--space-4); background: linear-gradient(135deg, var(--primary-50), var(--primary-100)); border-radius: var(--radius-lg); border: 1px solid var(--primary-200);">
+                <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--primary-700); margin-bottom: var(--space-2);">0</div>
+                <div style="color: var(--primary-600); font-weight: 600;">Comunicacions generades</div>
+            </div>
+            
+            <div style="text-align: center; padding: var(--space-4); background: linear-gradient(135deg, var(--success-50), var(--success-100)); border-radius: var(--radius-lg); border: 1px solid var(--success-200);">
+                <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--success-700); margin-bottom: var(--space-2);">0</div>
+                <div style="color: var(--success-600); font-weight: 600;">Clusters creats</div>
+            </div>
+            
+            <div style="text-align: center; padding: var(--space-4); background: linear-gradient(135deg, var(--warning-50), var(--warning-100)); border-radius: var(--radius-lg); border: 1px solid var(--warning-200);">
+                <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--warning-700); margin-bottom: var(--space-2);">{{ user.date_joined|date:"j M Y" }}</div>
+                <div style="color: var(--warning-600); font-weight: 600;">Membre des de</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Account Settings -->
+<div class="block">
+    <div class="block-title">
+        <div class="block-number warning">3</div>
+        <h2>Configuració del compte</h2>
+    </div>
+    <div class="block-content">
+        <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4); background: var(--gray-50); border-radius: var(--radius-md); border: 1px solid var(--gray-200);">
+                <div>
+                    <h3 style="margin: 0; color: var(--gray-900); font-weight: 600;">Canviar contrasenya</h3>
+                    <p style="margin: 0; color: var(--gray-600); font-size: var(--font-size-sm);">Actualitza la teva contrasenya per mantenir el compte segur</p>
+                </div>
+                <a href="#" class="btn btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: var(--space-1);">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <circle cx="12" cy="16" r="1"/>
+                        <path d="m12 13 0 2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    Canviar
+                </a>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4); background: var(--error-50); border-radius: var(--radius-md); border: 1px solid var(--error-200);">
+                <div>
+                    <h3 style="margin: 0; color: var(--error-700); font-weight: 600;">Eliminar compte</h3>
+                    <p style="margin: 0; color: var(--error-600); font-size: var(--font-size-sm);">Aquesta acció no es pot desfer. S'eliminaran totes les dades</p>
+                </div>
+                <button class="btn" style="background: var(--error-600); color: white; border: 1px solid var(--error-600);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: var(--space-1);">
+                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Afegir l'id al formulari per poder-lo referenciar des del botó
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[method="post"]');
+    if (form && !form.hasAttribute('id')) {
+        form.setAttribute('id', 'profile-form');
+    }
+});
+</script>
 {% endblock %}

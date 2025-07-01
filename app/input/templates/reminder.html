@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recordatori</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background-color: #fef2f2;
+            color: #333;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-left: 6px solid #ef4444;
+        }
+
+        .urgent-header {
+            background-color: #fee2e2;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid #fecaca;
+        }
+
+        .urgent-header h1 {
+            color: #dc2626;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .reminder-content {
+            background-color: #fffbeb;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border: 1px solid #fed7aa;
+        }
+
+        .deadline-box {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .deadline-box h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.5rem;
+        }
+
+        .action-items {
+            background-color: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .action-items h3 {
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+
+        .action-button {
+            background-color: #ef4444;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            margin: 1rem auto;
+            text-align: center;
+            width: 200px;
+        }
+
+        .footer {
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="urgent-header">
+            <h1>⚠️ [reminder_title]</h1>
+        </div>
+
+        <p style="font-size: 1.1rem; color: #374151;">[reminder_message]</p>
+
+        <div class="reminder-content">
+            <h3 style="color: #d97706; margin-bottom: 1rem;">Detalls del recordatori:</h3>
+            <p style="margin: 0;">[reminder_details]</p>
+        </div>
+
+        <div class="deadline-box">
+            <h2>📅 [deadline_title]</h2>
+            <p style="margin: 0; font-size: 1.2rem;">[deadline_date]</p>
+        </div>
+
+        <div class="action-items">
+            <h3>Què has de fer:</h3>
+            <ol style="color: #6b7280; line-height: 1.8;">
+                <li>[action_item_1]</li>
+                <li>[action_item_2]</li>
+                <li>[action_item_3]</li>
+            </ol>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="[action_url]" class="action-button">[action_button_text]</a>
+        </div>
+
+        <div class="footer">
+            Aquest és un recordatori automàtic. Si ja has completat aquesta acció, pots ignorar aquest missatge.
+        </div>
+    </div>
+</body>
+</html>

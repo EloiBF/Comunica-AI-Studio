@@ -4,103 +4,99 @@
 {% block title %}Dashboard - Comunica AI Studio{% endblock %}
 
 {% block content %}
-<div class="dashboard-overview">
     <!-- Page header -->
-    <header class="page-header mb-8">
-        <h1 style="font-size: var(--font-size-3xl); font-weight: 700; color: var(--gray-900); margin-bottom: var(--space-2);">
-            Benvingut al teu panell
-        </h1>
-        <p style="font-size: var(--font-size-lg); color: var(--gray-600);">
-            Gestiona les teves comunicacions i explora les funcionalitats d'IA
-        </p>
-    </header>
+    <div class="page-header">
+        <h1 class="page-title">Benvingut a Comunica AI Studio</h1>
+        <p class="page-subtitle">Genera comunicacions personalitzades amb IA</p>
+    </div>
 
     <!-- Quick actions -->
-    <section class="quick-actions mb-8" aria-labelledby="quick-actions-title">
-        <h2 id="quick-actions-title" style="font-size: var(--font-size-xl); font-weight: 600; color: var(--gray-900); margin-bottom: var(--space-6);">
-            Accions ràpides
-        </h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-6);">
-            <a href="/generate/" class="card" style="text-decoration: none; color: inherit;">
-                <div class="card-content">
-                    <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4);">
-                        <div style="background: linear-gradient(135deg, var(--primary-500), var(--primary-600)); width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                                <polyline points="14,2 14,8 20,8"/>
-                                <line x1="16" y1="13" x2="8" y2="13"/>
-                                <line x1="16" y1="17" x2="8" y2="17"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 style="font-weight: 600; color: var(--gray-900); margin-bottom: var(--space-1);">Generar Comunicació</h3>
-                            <p style="color: var(--gray-600); font-size: var(--font-size-sm);">Contingut generat amb IA, personalitzat per als teus clients.</p>
-                        </div>
-                    </div>
-                </div>
-            </a>
-
-            <a href="/clusters/" class="card" style="text-decoration: none; color: inherit;">
-                <div class="card-content">
-                    <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4);">
-                        <div style="background: linear-gradient(135deg, var(--success-500), #059669); width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                                <circle cx="12" cy="12" r="3"/>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 style="font-weight: 600; color: var(--gray-900); margin-bottom: var(--space-1);">Generar Clústers</h3>
-                            <p style="color: var(--gray-600); font-size: var(--font-size-sm);">Personalitza el contingut per segments, generats amb IA</p>
-                        </div>
-                    </div>
-                </div>
-            </a>
-
-            <a href="/context/" class="card" style="text-decoration: none; color: inherit;">
-                <div class="card-content">
-                    <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4);">
-                        <div style="background: linear-gradient(135deg, var(--warning-500), #d97706); width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                                <path d="M20 6L9 17l-5-5"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 style="font-weight: 600; color: var(--gray-900); margin-bottom: var(--space-1);">El meu Context</h3>
-                            <p style="color: var(--gray-600); font-size: var(--font-size-sm);">Configura el context que rebrà la IA per generar comunicacions</p>
-                        </div>
-                    </div>
-                </div>
-            </a>
+    <div class="block">
+        <div class="block-title">
+            <div class="block-number">1</div>
+            <h2>Accions ràpides</h2>
         </div>
-    </section>
-
-    <!-- Recent activity or stats could go here -->
-    <section class="recent-activity" aria-labelledby="activity-title">
-        <h2 id="activity-title" style="font-size: var(--font-size-xl); font-weight: 600; color: var(--gray-900); margin-bottom: var(--space-6);">
-            Activitat recent
-        </h2>
-        <div class="card">
-            <div class="card-content">
-                <div style="text-align: center; padding: var(--space-8);">
-                    <div style="background: var(--gray-100); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4);">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--gray-400)">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-                            <line x1="9" y1="9" x2="9.01" y2="9"/>
-                            <line x1="15" y1="9" x2="15.01" y2="9"/>
-                        </svg>
+        <div class="block-content">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-6);">
+                <a href="/generate/" class="card" style="text-decoration: none; color: inherit;">
+                    <div class="card-content">
+                        <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4);">
+                            <div style="background: var(--primary-100); width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--primary-700);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--gray-900); margin: 0; font-weight: 600;">Genera comunicació</h3>
+                                <p style="color: var(--gray-600); margin: 0; font-size: var(--font-size-sm);">Crea contingut personalitzat amb IA</p>
+                            </div>
+                        </div>
                     </div>
-                    <h3 style="color: var(--gray-700); margin-bottom: var(--space-2);">Encara no tens activitat</h3>
-                    <p style="color: var(--gray-500); margin-bottom: var(--space-6);">
-                        Comença creant la teva primera comunicació amb IA
-                    </p>
-                    <a href="/generate/" class="btn btn-primary">
-                        Crear primera comunicació
-                    </a>
-                </div>
+                </a>
+
+                <a href="/context/" class="card" style="text-decoration: none; color: inherit;">
+                    <div class="card-content">
+                        <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4);">
+                            <div style="background: var(--success-100); width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--success-700);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--gray-900); margin: 0; font-weight: 600;">El meu context</h3>
+                                <p style="color: var(--gray-600); margin: 0; font-size: var(--font-size-sm);">Personalitza la teva IA</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="/clusters/" class="card" style="text-decoration: none; color: inherit;">
+                    <div class="card-content">
+                        <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4);">
+                            <div style="background: var(--warning-100); width: 48px; height: 48px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--warning-700);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <circle cx="12" cy="5" r="2"/>
+                                    <circle cx="12" cy="19" r="2"/>
+                                    <circle cx="5" cy="12" r="2"/>
+                                    <circle cx="19" cy="12" r="2"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--gray-900); margin: 0; font-weight: 600;">Clusters</h3>
+                                <p style="color: var(--gray-600); margin: 0; font-size: var(--font-size-sm);">Analitza segments de clients</p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
-    </section>
-</div>
+    </div>
+
+    <!-- Recent activity -->
+    <div class="block">
+        <div class="block-title">
+            <div class="block-number success">2</div>
+            <h2>Activitat recent</h2>
+        </div>
+        <div class="block-content">
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--gray-400)">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10,9 9,9 8,9"/>
+                    </svg>
+                </div>
+                <h3 class="empty-state-title">Encara no has creat cap comunicació</h3>
+                <p class="empty-state-text">Comença creant la teva primera comunicació amb IA</p>
+                <a href="/generate/" class="btn btn-primary">Crear comunicació</a>
+            </div>
+        </div>
+    </div>
 {% endblock %}
