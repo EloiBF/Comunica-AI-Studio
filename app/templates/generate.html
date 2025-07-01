@@ -134,38 +134,6 @@
                     <div class="form-help">Sigues específic per obtenir millors resultats. Inclou detalls sobre el to, l'audiència i els punts clau a destacar.</div>
                 </div>
             </div>
-
-            <!-- Step 4: Audience Targeting (Optional) -->
-            <div class="form-step form-step-optional">
-                <div class="step-header">
-                    <div class="step-number optional">4</div>
-                    <div class="step-info">
-                        <h3>Segmentació d'audiència <span class="optional-badge">Opcional</span></h3>
-                        <p>Personalitza la comunicació per un segment específic de clients</p>
-                    </div>
-                </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="dataset" class="form-label">Dataset de clients</label>
-                        <select name="dataset" id="dataset" class="form-select">
-                            <option value="">-- Sense segmentació específica --</option>
-                            {% for dataset in available_datasets %}
-                                <option value="{{ dataset.name }}">{{ dataset.name|title }} ({{ dataset.num_clusters }} segments)</option>
-                            {% endfor %}
-                        </select>
-                        <div class="form-help">Selecciona un dataset per dirigir la comunicació a segments específics</div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="cluster" class="form-label">Segment específic</label>
-                        <select name="cluster" id="cluster" class="form-select" disabled>
-                            <option value="">-- Primer selecciona un dataset --</option>
-                        </select>
-                        <div class="form-help">Escull un segment concret o deixa-ho buit per a tots els segments</div>
-                    </div>
-                </div>
-            </div>
         </form>
     </div>
     <div class="block-actions">
@@ -293,63 +261,5 @@
         {% endif %}
     </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const datasetSelect = document.getElementById('dataset');
-    const clusterSelect = document.getElementById('cluster');
-    const templateCards = document.querySelectorAll('.template-card');
-    const templateInput = document.getElementById('template');
-
-    // Template selector functionality
-    templateCards.forEach(card => {
-        card.addEventListener('click', function() {
-            // Remove selected class from all cards
-            templateCards.forEach(c => c.classList.remove('selected'));
-            
-            // Add selected class to clicked card
-            this.classList.add('selected');
-            
-            // Set the hidden input value
-            templateInput.value = this.dataset.template;
-        });
-    });
-
-    // Dades dels clusters per dataset
-    const datasetsData = {
-        {% for dataset in available_datasets %}
-        '{{ dataset.name }}': {
-            {% if dataset.descriptions %}
-                {% for cluster_key, cluster_desc in dataset.descriptions.items %}
-                    '{{ cluster_key }}': '{{ cluster_desc.name|default:"Cluster"|escapejs }}',
-                {% endfor %}
-            {% endif %}
-        },
-        {% endfor %}
-    };
-
-    datasetSelect.addEventListener('change', function() {
-        const selectedDataset = this.value;
-        clusterSelect.innerHTML = '';
-
-        if (selectedDataset === '') {
-            clusterSelect.disabled = true;
-            clusterSelect.innerHTML = '<option value="">-- Selecciona primer un dataset --</option>';
-            return;
-        }
-
-        clusterSelect.disabled = false;
-        clusterSelect.innerHTML = '<option value="">-- Tots els clusters --</option>';
-
-        const clusters = datasetsData[selectedDataset] || {};
-        for (const [clusterId, clusterName] of Object.entries(clusters)) {
-            const option = document.createElement('option');
-            option.value = clusterId;
-            option.textContent = clusterName;
-            clusterSelect.appendChild(option);
-        }
-    });
-});
-</script>
 
 {% endblock %}

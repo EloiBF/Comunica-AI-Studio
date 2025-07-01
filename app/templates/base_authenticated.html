@@ -59,7 +59,7 @@
                         </div>
                         <div class="user-details">
                             <h2>{{ user.username|default:"Usuari" }}</h2>
-                            <p>Administrador</p>
+                            <p class="user-subscription">Subscripció: {{ subscription|default:"Free" }}</p>
                         </div>
                     </div>
                 </div>
@@ -80,7 +80,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/generate/" 
+                            <a href="{% url 'generate' %}" 
                                class="nav-link {% if request.resolver_match.url_name == 'generate' %}active{% endif %}"
                                aria-current="{% if request.resolver_match.url_name == 'generate' %}page{% else %}false{% endif %}">
                                 <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">

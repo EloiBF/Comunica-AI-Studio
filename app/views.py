@@ -10,7 +10,7 @@ from mimetypes import guess_type
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-
+from django.utils.timezone import now
 
 # Definim entorn on s'executarà aquest script (com si fos el root)
 base_dir = Path(__file__).resolve().parent.parent.parent  # Aquí, puja un nivell més alt per arribar a l'arrel
@@ -18,11 +18,13 @@ sys.path.append(str(base_dir))
 
 from app.scripts.utils import get_user_folder_path
 from app.scripts.gen_html import generate_content_from_prompt, render_template
+from core.models import UserProfile
 
 
 # Landing page (pública)
 def landing(request):
     return render(request, 'landing.html')
+
 
 # Signup
 def signup_view(request):
@@ -30,8 +32,10 @@ def signup_view(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            # Crear el perfil de l'usuari després del registre
+            UserProfile.objects.create(user=user)
             login(request, user)
-            return redirect('dashboard')  # Redirige a la pàgina de panell
+            return redirect('dashboard')  # Redirigeix a la pàgina de panell
     else:
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
@@ -43,14 +47,20 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('dashboard')
+            # Comprovar si el perfil ja existeix, sinó, crear-lo
+            if not hasattr(user, 'profile'):
+                UserProfile.objects.create(user=user)
+            return redirect('dashboard')  # O redirigeix a la pàgina que desitgis
+        else:
+            return render(request, 'login.html', {'form': form})
     else:
         form = AuthenticationForm()
-    return render(request, 'login.html', {'form': form})
-
+        return render(request, 'login.html', {'form': form})
+    
+# Logout
 def logout_view(request):
     logout(request)
-    return redirect('landing')  # Redirige a la página de inicio o donde desees
+    return redirect('landing')  # Redirigeix a la pàgina d'inici o on desitgis
 
 #  Serveix els fitxers generats
 @login_required
@@ -71,38 +81,35 @@ def generated_file(request, filename):
 def dashboard(request):
     return render(request, 'dashboard.html')
 
-
 @login_required
 def context_view(request):
     return render(request, 'context.html')
 
-
 @login_required
 def generate(request):
     TEMPLATE_DIR = settings.TEMPLATE_DIR
+    username = request.user.username
 
-    # Usar carpeta HTML específica per l'usuari
-    user_htmls_folder = get_user_folder_path(request.user.username, 'htmls')
+    # Carpeta HTML per a l’usuari
+    user_htmls_folder = get_user_folder_path(username, 'htmls')
     HTML_OUTPUT = user_htmls_folder
     os.makedirs(HTML_OUTPUT, exist_ok=True)
 
-    # Obtenir datasets de clusters de l'usuari des de la nova ubicació
-    clusters_folder = get_user_folder_path(request.user.username, 'clusters')
+    # Carpeta Clusters
+    clusters_folder = get_user_folder_path(username, 'clusters')
     clustering_files = [f for f in os.listdir(clusters_folder) if f.endswith('_clustering_summary.json')] if os.path.exists(clusters_folder) else []
+    
     available_datasets = []
-
     for file_name in clustering_files:
         table_name = file_name.replace('_clustering_summary.json', '')
+        clusters_desc_path = os.path.join(clusters_folder, f'{table_name}_clustering_descriptions.json')
+        clusters_summary_path = os.path.join(clusters_folder, file_name)
 
-        # Carregar descripcions si existeixen
-        clusters_desc_path = os.path.join(str(clusters_folder), f'{table_name}_clustering_descriptions.json')
+        # Carrega descripcions i summary
         clusters_descriptions = None
         if os.path.exists(clusters_desc_path):
             with open(clusters_desc_path, 'r', encoding='utf-8') as f:
                 clusters_descriptions = json.load(f)
-
-        # Carregar dades del clustering
-        clusters_summary_path = os.path.join(str(clusters_folder), file_name)
         with open(clusters_summary_path, 'r', encoding='utf-8') as f:
             clusters_data = json.load(f)
 
@@ -112,34 +119,41 @@ def generate(request):
             'num_clusters': len(clusters_data)
         })
 
-    # Si és POST i vol eliminar
+    # Detectar subscripció
+    try:
+        subscription = request.user.userprofile.subscription
+    except UserProfile.DoesNotExist:
+        subscription = 'free'
+
+    template_name = {
+        'free': 'generate.html',
+        'premium': 'generate_prem.html',
+        'enterprise': 'generate_enterprise.html'
+    }.get(subscription, 'generate.html')
+
+    # POST: eliminar comunicació
     if request.method == "POST" and request.POST.get("action") == "delete":
         filename = request.POST.get("filename")
         if filename:
             base_name = os.path.splitext(filename)[0]
             html_path = os.path.join(HTML_OUTPUT, base_name + ".html")
             json_path = os.path.join(HTML_OUTPUT, base_name + ".json")
+            if os.path.exists(html_path): os.remove(html_path)
+            if os.path.exists(json_path): os.remove(json_path)
+        return redirect("generate")
 
-            if os.path.exists(html_path):
-                os.remove(html_path)
-            if os.path.exists(json_path):
-                os.remove(json_path)
-
-        return redirect("generate")  # Nom de la URL (assegura’t que coincideix amb el `name` de la teva ruta)
-
-    # Si és POST i vol generar nova comunicació
+    # POST: generar nova comunicació
     elif request.method == "POST":
         communication_name = request.POST.get("name")
         prompt = request.POST.get("prompt")
-        template_name = request.POST.get("template")
+        selected_template = request.POST.get("template")
         dataset_name = request.POST.get("dataset", "")
         cluster_id = request.POST.get("cluster", "")
 
-        generated_data = generate_content_from_prompt(prompt, template_name)
+        generated_data = generate_content_from_prompt(prompt, selected_template)
 
         try:
-            # Llegeix plantilla HTML
-            template_path = os.path.join(TEMPLATE_DIR, template_name)
+            template_path = os.path.join(TEMPLATE_DIR, selected_template)
             with open(template_path, 'r', encoding='utf-8') as file:
                 template = file.read()
 
@@ -152,31 +166,38 @@ def generate(request):
             html_path = os.path.join(HTML_OUTPUT, html_filename)
             json_path = os.path.join(HTML_OUTPUT, json_filename)
 
-            os.makedirs(HTML_OUTPUT, exist_ok=True)
             with open(html_path, 'w', encoding='utf-8') as f:
                 f.write(rendered_html)
 
             metadata = {
                 "name": communication_name,
                 "prompt": prompt,
-                "template": template_name,
+                "template": selected_template,
                 "dataset": dataset_name if dataset_name else None,
                 "cluster": cluster_id if cluster_id else None,
-                "created_at": datetime.now().isoformat()
+                "created_at": now().isoformat()
             }
             with open(json_path, 'w', encoding='utf-8') as f:
                 json.dump(metadata, f, indent=4, ensure_ascii=False)
 
         except FileNotFoundError:
-            return render(request, 'generate.html', {
+            return render(request, template_name, {
                 'generated_content': "❌ Plantilla no trobada.",
                 'generated_metadata': [],
-                'generated_html_files': []
+                'generated_html_files': [],
+                'subscription': subscription,
+                'available_datasets': available_datasets
             })
 
-        return redirect("generate")
+        return render(request, template_name, {
+            'generated_content': rendered_html,
+            'generated_metadata': [metadata],
+            'generated_html_files': [html_filename],
+            'subscription': subscription,
+            'available_datasets': available_datasets
+        })
 
-    # GET: carrega les metadades existents
+    # GET: mostrar comunicacions existents
     generated_metadata = []
     generated_html_files = [f for f in os.listdir(HTML_OUTPUT) if f.endswith('.html')]
 
@@ -191,12 +212,14 @@ def generate(request):
             except (json.JSONDecodeError, FileNotFoundError) as e:
                 print(f"Error carregant metadades de {filename}: {e}")
 
-    return render(request, 'generate.html', {
+    return render(request, template_name, {
         'generated_content': None,
         'generated_html_files': generated_html_files,
         'generated_metadata': generated_metadata,
-        'available_datasets': available_datasets
+        'available_datasets': available_datasets,
+        'subscription': subscription
     })
+
 
 @login_required
 def clusters(request):
@@ -329,3 +352,18 @@ def journey_builder(request):
 @login_required
 def profile(request):
     return render(request, 'profile.html')
+
+
+@login_required
+def user_details(request):
+    user = request.user
+    try:
+        profile = UserProfile.objects.get(user=user)
+        subscription = profile.get_subscription_display()  # Obtenim el valor llegible de la subscripció
+    except UserProfile.DoesNotExist:
+        subscription = 'Free'  # Per defecte si el perfil no existeix
+
+    return render(request, 'user_details.html', {
+        'user': user,
+        'subscription': subscription,  # Pasem el valor llegible de la subscripció a la plantilla
+    })
