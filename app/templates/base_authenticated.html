@@ -38,9 +38,8 @@
             </div>
             <div class="nav-links">
                 <span class="user-greeting">Hola, {{ user.username|default:"Usuari" }}</span>
-                <a href="/dashboard/" class="btn btn-secondary">Inici</a>
-                <a href="/logout/" class="btn btn-secondary">Tanca sessió</a>
-            </div>
+                <div class="btn btn-secondary" onclick="window.location.href='/dashboard/'">Inici</div>
+                <div class="btn btn-secondary" onclick="window.location.href='/logout/'">Tanca sessió</div>
         </nav>
     </header>
 

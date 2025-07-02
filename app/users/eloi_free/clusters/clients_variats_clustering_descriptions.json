@@ -1,0 +1,32 @@
+{
+  "cluster_0": {
+    "name": "Estatistes i professionals financers",
+    "description": "Aquest segment està format per persones que viuen en zones urbanes amb codis postals centrals i que treballen en sectors com el turisme i la finança. Tenen una edat mitjana similar a la global.",
+    "recommendations": "Estratègies de targetització per a la publicitat i els serveis financers"
+  },
+  "cluster_1": {
+    "name": "Treballadors de l'automòbil",
+    "description": "Aquest segment està format per persones que treballen en el sector de l'automòbil i que viuen en zones urbanes amb codis postals centrals. Tenen una alta proporció d'homes i una edat mitjana inferior a la global.",
+    "recommendations": "Estratègies de targetització per a la publicitat i els serveis relacionats amb l'automòbil"
+  },
+  "cluster_2": {
+    "name": "Professionals de la salut",
+    "description": "Aquest segment està format per persones que treballen en el sector de la salut i que viuen en zones urbanes amb codis postals centrals. Tenen una alta proporció de dones i una edat mitjana similar a la global.",
+    "recommendations": "Estratègies de targetització per a la publicitat i els serveis relacionats amb la salut"
+  },
+  "cluster_3": {
+    "name": "Professionals de l'educació",
+    "description": "Aquest segment està format per persones que treballen en el sector de l'educació i que viuen en zones urbanes amb codis postals centrals. Tenen una alta proporció de dones i una edat mitjana similar a la global.",
+    "recommendations": "Estratègies de targetització per a la publicitat i els serveis relacionats amb l'educació"
+  },
+  "cluster_4": {
+    "name": "Professionals de la tecnologia",
+    "description": "Aquest segment està format per persones que treballen en el sector de la tecnologia i que viuen en zones urbanes amb codis postals centrals. Tenen una alta proporció d'homes i una edat mitjana inferior a la global.",
+    "recommendations": "Estratègies de targetització per a la publicitat i els serveis relacionats amb la tecnologia"
+  },
+  "cluster_5": {
+    "name": "Comercials",
+    "description": "Aquest segment està format per persones que treballen en el sector comercial i que viuen en zones urbanes amb codis postals centrals. Tenen una alta proporció d'homes i una edat mitjana similar a la global.",
+    "recommendations": "Estratègies de targetització per a la publicitat i els serveis relacionats amb el comerç"
+  }
+}

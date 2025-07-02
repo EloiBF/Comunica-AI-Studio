@@ -7,109 +7,178 @@
     <title>Enquesta</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            padding: 2rem;
-            background-color: #f0f9ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #333;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 700px;
+            max-width: 600px;
             margin: 0 auto;
             background-color: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            border-top: 5px solid #0ea5e9;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
         }
 
-        h1 {
-            color: #0369a1;
+        .header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+            color: white;
+            padding: 30px;
             text-align: center;
-            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 30px;
         }
 
         .survey-intro {
-            background-color: #e0f2fe;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            border-left: 4px solid #0ea5e9;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 5px solid #0ea5e9;
+        }
+
+        .survey-intro p {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #0c4a6e;
         }
 
         .question-section {
-            background-color: #f8fafc;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            border: 1px solid #e2e8f0;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #e2e8f0;
         }
 
         .question-section h3 {
             color: #0369a1;
-            margin-bottom: 1rem;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .question-section ul {
+            color: #64748b;
+            line-height: 1.8;
+            margin: 0;
+            padding-left: 20px;
         }
 
         .incentive-box {
-            background: linear-gradient(135deg, #0ea5e9, #0369a1);
+            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
             color: white;
-            padding: 1.5rem;
-            border-radius: 8px;
+            padding: 25px;
+            border-radius: 12px;
             text-align: center;
-            margin: 2rem 0;
+            margin: 25px 0;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+
+        .incentive-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .incentive-box p {
+            margin: 0;
+            opacity: 0.9;
         }
 
         .survey-button {
-            background-color: #0ea5e9;
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            text-decoration: none;
             display: inline-block;
-            font-weight: bold;
-            margin: 1rem auto;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+            color: white !important;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 20px auto;
             text-align: center;
-            width: 200px;
+            transition: transform 0.2s ease;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+
+        .survey-button:hover {
+            transform: translateY(-2px);
         }
 
         .footer {
-            font-size: 0.85rem;
-            margin-top: 2rem;
-            color: #777;
+            background-color: #f8fafc;
+            padding: 20px 30px;
             text-align: center;
+            font-size: 0.9rem;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .time-estimate {
+            text-align: center;
+            font-weight: 600;
+            color: #0369a1;
+            margin: 20px 0;
+            font-size: 1.1rem;
+        }
+
+        .purpose-text {
+            color: #475569;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>[survey_title]</h1>
+        <div class="header">
+            <h1>[survey_title]</h1>
+        </div>
         
-        <div class="survey-intro">
-            <p style="margin: 0; font-size: 1.1rem;">[survey_intro]</p>
+        <div class="content">
+            <div class="survey-intro">
+                <p>[survey_intro]</p>
+            </div>
+
+            <p class="purpose-text">[survey_purpose]</p>
+
+            <div class="question-section">
+                <h3>El que t'preguntarem:</h3>
+                <ul>
+                    <li>[question_topic_1]</li>
+                    <li>[question_topic_2]</li>
+                    <li>[question_topic_3]</li>
+                </ul>
+            </div>
+
+            <div class="incentive-box">
+                <h3>🎁 [incentive_title]</h3>
+                <p>[incentive_description]</p>
+            </div>
+
+            <p class="time-estimate">⏱️ Temps estimat: [estimated_time]</p>
+
+            <div class="center">
+                <a href="[survey_url]" class="survey-button">[survey_button_text]</a>
+            </div>
         </div>
-
-        <p>[survey_purpose]</p>
-
-        <div class="question-section">
-            <h3>El que t'preguntarem:</h3>
-            <ul style="color: #64748b; line-height: 1.6;">
-                <li>[question_topic_1]</li>
-                <li>[question_topic_2]</li>
-                <li>[question_topic_3]</li>
-            </ul>
-        </div>
-
-        <div class="incentive-box">
-            <h3 style="margin: 0 0 0.5rem 0;">🎁 [incentive_title]</h3>
-            <p style="margin: 0;">[incentive_description]</p>
-        </div>
-
-        <p style="text-align: center; font-weight: bold; color: #0369a1;">⏱️ Temps estimat: [estimated_time]</p>
-
-        <div style="text-align: center;">
-            <a href="[survey_url]" class="survey-button">[survey_button_text]</a>
-        </div>
-
+        
         <div class="footer">
             Les teves respostes són confidencials i ens ajuden a millorar els nostres serveis.
         </div>

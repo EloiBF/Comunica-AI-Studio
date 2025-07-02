@@ -7,29 +7,37 @@
     <title>Gràcies</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            padding: 2rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #333;
             min-height: 100vh;
         }
 
         .container {
-            max-width: 700px;
+            max-width: 600px;
             margin: 0 auto;
             background-color: white;
-            padding: 3rem;
             border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
             text-align: center;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 40px 30px;
         }
 
         .thank-you-icon {
             width: 80px;
             height: 80px;
-            background-color: #10b981;
+            background-color: rgba(255,255,255,0.2);
             border-radius: 50%;
-            margin: 0 auto 2rem auto;
+            margin: 0 auto 20px auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -37,72 +45,117 @@
             color: white;
         }
 
-        h1 {
-            color: #059669;
+        .header h1 {
+            margin: 0;
             font-size: 2.5rem;
-            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 30px;
         }
 
         .main-message {
             font-size: 1.3rem;
             color: #374151;
-            margin-bottom: 2rem;
+            margin-bottom: 25px;
             line-height: 1.6;
         }
 
         .appreciation-box {
-            background-color: #ecfdf5;
-            padding: 2rem;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            padding: 25px;
             border-radius: 12px;
-            margin: 2rem 0;
+            margin: 25px 0;
             border: 2px solid #10b981;
         }
 
+        .appreciation-box h3 {
+            color: #059669;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .appreciation-box p {
+            margin: 0;
+            color: #374151;
+        }
+
         .next-steps {
-            background-color: #f9fafb;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 2rem 0;
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
             text-align: left;
+            border: 2px solid #e5e7eb;
+        }
+
+        .next-steps h3 {
+            color: #374151;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .next-steps ul {
+            color: #6b7280;
+            line-height: 1.6;
+            margin: 0;
+            padding-left: 20px;
         }
 
         .contact-info {
-            background-color: #f3f4f6;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 2rem;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
             font-size: 0.9rem;
             color: #6b7280;
+            border: 2px solid #d1d5db;
+        }
+
+        .contact-info strong {
+            color: #374151;
+        }
+
+        .closing-message {
+            color: #475569;
+            margin: 20px 0;
+            font-size: 1.1rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="thank-you-icon">✓</div>
-        
-        <h1>[thank_you_title]</h1>
-        
-        <p class="main-message">[thank_you_message]</p>
-
-        <div class="appreciation-box">
-            <h3 style="color: #059669; margin-bottom: 1rem;">[appreciation_title]</h3>
-            <p style="margin: 0; color: #374151;">[appreciation_message]</p>
+        <div class="header">
+            <div class="thank-you-icon">✓</div>
+            <h1>[thank_you_title]</h1>
         </div>
+        
+        <div class="content">
+            <p class="main-message">[thank_you_message]</p>
 
-        <div class="next-steps">
-            <h3 style="color: #374151; margin-bottom: 1rem;">Següents passos:</h3>
-            <ul style="color: #6b7280; line-height: 1.6; margin: 0;">
-                <li>[next_step_1]</li>
-                <li>[next_step_2]</li>
-                <li>[next_step_3]</li>
-            </ul>
-        </div>
+            <div class="appreciation-box">
+                <h3>[appreciation_title]</h3>
+                <p>[appreciation_message]</p>
+            </div>
 
-        <p>[closing_message]</p>
+            <div class="next-steps">
+                <h3>Següents passos:</h3>
+                <ul>
+                    <li>[next_step_1]</li>
+                    <li>[next_step_2]</li>
+                    <li>[next_step_3]</li>
+                </ul>
+            </div>
 
-        <div class="contact-info">
-            <strong>Necessites ajuda?</strong><br>
-            Contacta'ns a [contact_email] o visita [website_url]
+            <p class="closing-message">[closing_message]</p>
+
+            <div class="contact-info">
+                <strong>Necessites ajuda?</strong><br>
+                Contacta'ns a [contact_email] o visita [website_url]
+            </div>
         </div>
     </div>
 </body>

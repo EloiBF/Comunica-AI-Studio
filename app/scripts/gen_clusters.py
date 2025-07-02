@@ -120,8 +120,8 @@ Genera una sentència SQL CREATE TABLE per crear una nova taula anomenada '{clus
 que contingui NOMÉS les columnes més rellevants per fer clustering (anàlisi de segments).
 
 Regles:
-1. Selecciona només columnes numèriques o categòriques útils per clustering
-2. Evita IDs, noms o columnes identificatives
+1. Selecciona només columnes numèriques (amb un valor real, no codis) o categòriques útils per clustering.
+2. Evita IDs, noms o columnes identificatives (com codis o noms de clients). Verifica que no es seleccionin columnes que no aportin valor al clustering.
 3. Inclou columnes que puguin revelar patrons de comportament
 4. La sentència ha de ser: CREATE TABLE {clustering_table_name} AS SELECT ... FROM {original_table_name};
 5. No afegeixis comentaris, només el SQL

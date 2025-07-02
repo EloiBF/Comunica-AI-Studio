@@ -109,6 +109,17 @@ def generate(request):
     clusters_folder = get_user_folder_path(username, 'clusters')
     clustering_files = [f for f in os.listdir(clusters_folder) if f.endswith('_clustering_summary.json')] if os.path.exists(clusters_folder) else []
     
+    # Definició de les plantilles disponibles
+    TEMPLATES = [
+    ('sale.html', '💰', 'Vendes', 'Promocions i ofertes comercials'),
+    ('tips.html', '💡', 'Consells', 'Consells útils i pràctics'),
+    ('welcome.html', '👋', 'Benvinguda', 'Missatges de benvinguda'),
+    ('survey.html', '📊', 'Enquesta', "Recollida d'opinions"),
+    ('thank_you.html', '🙏', 'Agraïment', 'Missatges de gratitud'),
+    ('reminder.html', '⏰', 'Recordatori', 'Recordatoris i avisos'),
+    ('announcement.html', '📢', 'Anunci', 'Comunicats oficials'),
+]
+
     available_datasets = []
     for file_name in clustering_files:
         table_name = file_name.replace('_clustering_summary.json', '')
@@ -197,7 +208,8 @@ def generate(request):
                 'generated_metadata': [],
                 'generated_html_files': [],
                 'subscription': subscription,
-                'available_datasets': available_datasets
+                'available_datasets': available_datasets,
+                'templates': TEMPLATES,  # 👈 AFEGIT
             })
 
         return render(request, template_name, {
@@ -205,8 +217,10 @@ def generate(request):
             'generated_metadata': [metadata],
             'generated_html_files': [html_filename],
             'subscription': subscription,
-            'available_datasets': available_datasets
+            'available_datasets': available_datasets,
+            'templates': TEMPLATES,  # 👈 AFEGIT
         })
+
 
     # GET: mostrar comunicacions existents
     generated_metadata = []
@@ -228,8 +242,44 @@ def generate(request):
         'generated_html_files': generated_html_files,
         'generated_metadata': generated_metadata,
         'available_datasets': available_datasets,
-        'subscription': subscription
+        'subscription': subscription,
+        'templates': TEMPLATES,  # 👈 AFEGIT
     })
+
+
+
+
+
+
+
+@login_required
+def plantilla_preview(request, plantilla_nom):
+    # Obtens la ruta completa de la plantilla
+    TEMPLATE_DIR = settings.TEMPLATE_DIR
+    nom_arxiu = plantilla_nom if plantilla_nom.endswith(".html") else f"{plantilla_nom}.html"
+    ruta = os.path.join(TEMPLATE_DIR, nom_arxiu)
+
+    # Comprovar si el fitxer existeix
+    if not os.path.exists(ruta):
+        raise Http404("Plantilla no trobada.")
+    
+    # Intentem llegir el contingut de la plantilla
+    try:
+        with open(ruta, 'r', encoding='utf-8') as f:
+            contingut = f.read()
+        return HttpResponse(contingut)  # Retornem el contingut com a HTML
+    except Exception as e:
+        raise Http404(f"Error al carregar la plantilla: {str(e)}")
+
+
+
+
+
+
+
+
+
+
 
 
 @login_required

@@ -33,11 +33,12 @@
             </div>
             <div class="nav-links">
                 {% if user.is_authenticated %}
-                    <a href="/dashboard/" class="btn btn-secondary">Panell</a>
-                    <a href="/logout/" class="btn btn-secondary">Tanca sessió</a>
+                    <span class="nav-username">{{ user.username }}</span>
+                    <div class="btn btn-secondary" onclick="window.location.href='/dashboard/'">Accedir</div>
+                    <div class="btn btn-secondary" onclick="window.location.href='/logout/'">Tanca sessió</div>
                 {% else %}
-                    <a href="/login/" class="btn btn-secondary">Inicia sessió</a>
-                    <a href="/signup/" class="btn btn-primary">Registra't</a>
+                    <div class="btn btn-secondary" onclick="window.location.href='/login/'">Inicia sessió</div>
+                    <div class="btn btn-primary" onclick="window.location.href='/signup/'">Registra't</div>
                 {% endif %}
             </div>
         </nav>

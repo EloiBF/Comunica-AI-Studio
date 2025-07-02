@@ -17,25 +17,34 @@
             <p class="hero-description">
                 Transforma les teves idees en comunicacions professionals i personalitzades amb la nostra plataforma d'IA avançada. Ràpid, fàcil i efectiu.
             </p>
-            <div class="hero-actions">
-                <a href="/signup/" class="btn btn-primary btn-lg" aria-describedby="signup-description">
+        <div class="hero-actions">
+            {% if user.is_authenticated %}
+                <div class="btn btn-secondary btn-lg" onclick="window.location.href='/dashboard/'">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                        <polyline points="10,17 15,12 10,7"/>
+                        <line x1="15" y1="12" x2="3" y2="12"/>
+                    </svg>
+                    Accedeix
+                </div>
+            {% else %}
+                <div class="btn btn-primary btn-lg" onclick="window.location.href='/signup/'" aria-describedby="signup-description">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M13 3l3.293 3.293-7 7 1.414 1.414 7-7L21 11V3z"/>
                         <path d="M19 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"/>
                     </svg>
                     Comença ara gratuït
-                </a>
-                {% if not user.is_authenticated %}
-                    <a href="/login/" class="btn btn-secondary btn-lg">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                            <polyline points="10,17 15,12 10,7"/>
-                            <line x1="15" y1="12" x2="3" y2="12"/>
-                        </svg>
-                        Ja tinc compte
-                    </a>
-                {% endif %}
-            </div>
+                </div>
+                <div class="btn btn-secondary btn-lg" onclick="window.location.href='/login/'">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" fill="var(--gray-800)"/>
+                        <polyline points="10,17 15,12 10,7" fill="none" stroke="var(--gray-800)" stroke-width="2"/>
+                        <line x1="15" y1="12" x2="3" y2="12" stroke="var(--gray-800)" stroke-width="2"/>
+                    </svg>
+                    Ja tinc compte
+                </div>
+            {% endif %}
+        </div>
             <p id="signup-description" class="sr-only">Registra't gratuïtament per començar a crear comunicacions amb IA</p>
         </div>
     </section>
@@ -250,194 +259,4 @@
         </a>
     </section>
 </article>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-/* Additional landing page specific styles */
-.landing-page {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.feature-icon {
-    transition: transform var(--transition-normal);
-}
-
-.feature-card:hover .feature-icon {
-    transform: scale(1.05) rotate(2deg);
-}
-
-/* Pricing Section */
-.pricing-section {
-    padding: var(--space-16) 0;
-    text-align: center;
-}
-
-.pricing-section h2 {
-    font-size: var(--font-size-3xl);
-    margin-bottom: var(--space-4);
-    color: var(--gray-900);
-    font-weight: 700;
-}
-
-.pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: var(--space-8);
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--space-4);
-}
-
-.pricing-card {
-    background: white;
-    border-radius: var(--radius-xl);
-    padding: var(--space-8);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    border: 2px solid var(--gray-200);
-    position: relative;
-    transition: all var(--transition-normal);
-}
-
-.pricing-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.pricing-card-popular {
-    border-color: var(--primary-500);
-    transform: scale(1.05);
-}
-
-.pricing-card-popular:hover {
-    transform: scale(1.05) translateY(-4px);
-}
-
-.popular-badge {
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
-    color: white;
-    padding: var(--space-2) var(--space-4);
-    border-radius: var(--radius-full);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-}
-
-.pricing-header {
-    margin-bottom: var(--space-8);
-}
-
-.pricing-header h3 {
-    font-size: var(--font-size-xl);
-    margin-bottom: var(--space-4);
-    color: var(--gray-900);
-    font-weight: 700;
-}
-
-.pricing-price {
-    margin-bottom: var(--space-2);
-}
-
-.price-amount {
-    font-size: var(--font-size-4xl);
-    font-weight: 700;
-    color: var(--gray-900);
-}
-
-.price-period {
-    font-size: var(--font-size-lg);
-    color: var(--gray-500);
-    font-weight: 500;
-}
-
-.pricing-description {
-    color: var(--gray-600);
-    margin: 0;
-}
-
-.pricing-features {
-    margin-bottom: var(--space-8);
-}
-
-.feature-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    margin-bottom: var(--space-4);
-    font-size: var(--font-size-base);
-}
-
-.feature-item:last-child {
-    margin-bottom: 0;
-}
-
-.feature-icon {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-}
-
-.feature-included .feature-icon {
-    color: var(--success-500);
-}
-
-.feature-excluded .feature-icon {
-    color: var(--error-500);
-}
-
-.feature-included span {
-    color: var(--gray-700);
-}
-
-.feature-excluded span {
-    color: var(--gray-400);
-    text-decoration: line-through;
-}
-
-.pricing-action {
-    margin-top: auto;
-}
-
-.pricing-btn {
-    width: 100%;
-    justify-content: center;
-}
-
-@media (max-width: 768px) {
-    .hero-section {
-        padding: var(--space-12) var(--space-6);
-    }
-    
-    .features-section {
-        padding: var(--space-8) 0;
-    }
-    
-    .pricing-section {
-        padding: var(--space-12) 0;
-    }
-    
-    .pricing-grid {
-        grid-template-columns: 1fr;
-        gap: var(--space-6);
-        padding: 0 var(--space-6);
-    }
-    
-    .pricing-card-popular {
-        transform: none;
-    }
-    
-    .pricing-card-popular:hover {
-        transform: translateY(-4px);
-    }
-    
-    .cta-section {
-        padding: var(--space-12) var(--space-6);
-        margin-top: var(--space-8);
-    }
-}
-</style>
 {% endblock %}
