@@ -1,0 +1,87 @@
+/* Estilos específicos para las plantillas generadas */
+
+/* Estilos base para todas las plantillas */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: var(--text-color);
+    min-height: 100vh;
+}
+
+/* Funciones CSS para calcular colores secundarios */
+:root {
+    --primary-hue: 220;
+    --primary-sat: 70%;
+    --primary-light: 40%;
+
+    /* Extraer valores HSL del color principal */
+    --primary-hue: calc(hue(var(--primary-color)));
+    --primary-sat: calc(saturation(var(--primary-color)));
+    --primary-light: calc(lightness(var(--primary-color)));
+
+    /* Ajustar valores para colores secundarios */
+    --secondary-sat: calc(var(--primary-sat) - 20%);
+    --secondary-light: calc(var(--primary-light) - 15%);
+    --accent-sat: calc(var(--primary-sat) - 10%);
+    --accent-light: calc(var(--primary-light) + 10%);
+    --background-sat: calc(var(--primary-sat) - 30%);
+    --background-light: calc(var(--primary-light) + 40%);
+    --text-sat: calc(var(--primary-sat) - 40%);
+    --text-light: calc(var(--primary-light) - 30%);
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: var(--background-color);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.content {
+    padding: 30px;
+    color: var(--text-color);
+}
+
+/* Estilos específicos por tipo de plantilla */
+/* Estos estilos se pueden sobrescribir en cada plantilla según sea necesario */
+
+/* Plantilla de venta */
+.sale-template {
+    --primary-color: #ff4757;
+    --secondary-color: #ff6b81;
+    --accent-color: #ff9671;
+}
+
+/* Plantilla de bienvenida */
+.welcome-template {
+    --primary-color: #7bed9f;
+    --secondary-color: #a8e063;
+    --accent-color: #55efc4;
+}
+
+/* Plantilla de anuncio */
+.announcement-template {
+    --primary-color: #74b9ff;
+    --secondary-color: #0984e3;
+    --accent-color: #00b894;
+}
+
+/* Plantilla de encuesta */
+.survey-template {
+    --primary-color: #dfe6e9;
+    --secondary-color: #b2bec3;
+    --accent-color: #6c5ce7;
+}
+

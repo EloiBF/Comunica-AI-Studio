@@ -1,0 +1,120 @@
+:root {
+    --primary-color: #667eea;
+    --primary-hover: #5a67d8;
+    --primary-light: #a3bffa;
+    --secondary-color: #764ba2;
+    --accent-color: #10b981;
+    --text-color: #333;
+    --bg-color: #ffffff;
+    --muted-color: #6b7280;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--secondary-color, #764ba2) 100%);
+    color: var(--text-color, #333);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: var(--bg-color, #ffffff);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.header {
+    background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--secondary-color, #764ba2) 100%);
+    color: white;
+    padding: 40px 30px;
+    text-align: center;
+}
+
+.header h1 {
+    margin: 0 0 15px 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.welcome-message {
+    color: rgba(255,255,255,0.9);
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.content {
+    padding: 30px;
+}
+
+.benefits {
+    background: linear-gradient(135deg, var(--bg-color, #f8fafc) 0%, var(--bg-color, #e2e8f0) 100%);
+    padding: 25px;
+    border-radius: 12px;
+    margin: 25px 0;
+}
+
+.benefits h2 {
+    color: var(--text-color, #333);
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 8px 0;
+}
+
+.benefit-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--accent-color, #10b981);
+    border-radius: 50%;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.benefit-item span {
+    font-size: 1rem;
+    color: var(--muted-color, #6b7280);
+}
+
+.cta-button {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--secondary-color, #764ba2) 100%);
+    color: white !important;
+    padding: 15px 30px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 20px auto;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    background: linear-gradient(135deg, var(--primary-hover, #5a67d8) 0%, var(--secondary-color, #764ba2) 100%);
+}
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9rem;
+    color: var(--muted-color, #6b7280);
+    border-top: 1px solid #e5e7eb;
+}

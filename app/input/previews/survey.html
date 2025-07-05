@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>We Value Your Feedback</title>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: #c7d2fe;
+            --secondary-color: #8b5cf6;
+            --accent-color: #10b981;
+            --text-color: #1f2937;
+            --bg-color: #ffffff;
+            --muted-color: #6b7280;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0 0 15px 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            max-width: 80%;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .intro p {
+            color: var(--muted-color);
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .survey-question {
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .survey-question:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .rating-scale {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        .rating-option {
+            text-align: center;
+            flex: 1;
+            padding: 8px 5px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .rating-option:hover {
+            background-color: #f8fafc;
+            border-color: var(--primary-light);
+        }
+
+        .rating-option.selected {
+            background-color: var(--primary-light);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .rating-number {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .rating-label {
+            font-size: 0.8rem;
+            color: var(--muted-color);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.5;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.2s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"] {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .checkbox-group {
+            margin: 10px 0;
+        }
+
+        .checkbox-item {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 4px;
+        }
+
+        .checkbox-item label {
+            font-weight: normal;
+            cursor: pointer;
+            line-height: 1.5;
+        }
+
+        .cta-button {
+            display: block;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white !important;
+            padding: 14px 30px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin: 40px auto 20px;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .disclaimer {
+            font-size: 0.85rem;
+            color: var(--muted-color);
+            text-align: center;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            background-color: #f8fafc;
+            color: var(--muted-color);
+            font-size: 0.9rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>We Value Your Feedback</h1>
+            <p>Please take a few minutes to share your experience with us</p>
+        </div>
+        
+        <div class="content">
+            <div class="intro">
+                <p>Dear [Customer Name],</p>
+                <p>Your opinion is important to us! We'd love to hear about your recent experience with our service.</p>
+                <p>This survey will take approximately 3 minutes to complete.</p>
+            </div>
+            
+            <form action="#" method="POST">
+                <div class="form-group">
+                    <label for="name">Your Name (Optional)</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address (Optional)</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email">
+                </div>
+                
+                <div class="survey-question">
+                    <div class="question-text">1. How satisfied are you with our product/service?</div>
+                    <div class="rating-scale">
+                        <div class="rating-option">
+                            <div class="rating-number">1</div>
+                            <div class="rating-label">Very Dissatisfied</div>
+                        </div>
+                        <div class="rating-option">
+                            <div class="rating-number">2</div>
+                            <div class="rating-label">Dissatisfied</div>
+                        </div>
+                        <div class="rating-option">
+                            <div class="rating-number">3</div>
+                            <div class="rating-label">Neutral</div>
+                        </div>
+                        <div class="rating-option">
+                            <div class="rating-number">4</div>
+                            <div class="rating-label">Satisfied</div>
+                        </div>
+                        <div class="rating-option">
+                            <div class="rating-number">5</div>
+                            <div class="rating-label">Very Satisfied</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="survey-question">
+                    <div class="question-text">2. How likely are you to recommend us to others?</div>
+                    <div class="rating-scale">
+                        <div class="rating-option">
+                            <div class="rating-number">1</div>
+                            <div class="rating-label">Not at all</div>
+                        </div>
+                        <div class="rating-option">
+                            <div class="rating-number">2</div>
+                        </div>
+                        <div class="rating-option">
+                            <div class="rating-number">3</div>
+                        </div>
+                        <div class="rating-option">
+                            <div class="rating-number">4</div>
+                        </div>
+                        <div class="rating-option">
+                            <div class="rating-number">5</div>
+                            <div class="rating-label">Extremely</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="survey-question">
+                    <div class="question-text">3. What did you like most about our product/service?</div>
+                    <textarea name="liked_most" placeholder="Please share your thoughts..."></textarea>
+                </div>
+                
+                <div class="survey-question">
+                    <div class="question-text">4. How can we improve our product/service?</div>
+                    <textarea name="improvements" placeholder="Your suggestions are valuable to us..."></textarea>
+                </div>
+                
+                <div class="survey-question">
+                    <div class="question-text">5. Which of the following features do you use most often? (Select all that apply)</div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feature1" name="features[]" value="feature1">
+                            <label for="feature1">Feature One</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feature2" name="features[]" value="feature2">
+                            <label for="feature2">Feature Two</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feature3" name="features[]" value="feature3">
+                            <label for="feature3">Feature Three</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feature4" name="features[]" value="feature4">
+                            <label for="feature4">Feature Four</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="cta-button">Submit Feedback</button>
+                
+                <p class="disclaimer">
+                    Your feedback is anonymous unless you choose to provide your contact information. 
+                    All responses will be kept confidential and used to improve our products and services.
+                </p>
+            </form>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 Our Company. All rights reserved.</p>
+            <p style="margin-top: 15px;">
+                <a href="#">Privacy Policy</a> • 
+                <a href="#">Terms of Service</a> • 
+                <a href="#">Contact Us</a>
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Add interactivity to rating options
+        document.querySelectorAll('.rating-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selected class from all options in the same question
+                const question = this.closest('.survey-question');
+                question.querySelectorAll('.rating-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked option
+                this.classList.add('selected');
+                
+                // You can add hidden input handling here if needed
+                // const input = document.createElement('input');
+                // input.type = 'hidden';
+                // input.name = 'question_' + question.dataset.questionNumber;
+                // input.value = this.dataset.value;
+                // question.appendChild(input);
+            });
+        });
+    </script>
+</body>
+</html>

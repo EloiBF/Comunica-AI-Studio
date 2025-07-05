@@ -17,5 +17,5 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('generated/<str:filename>', views.generated_file, name='generated_file'),
     path('context/', views.context_view, name='context'),
-    path('plantilla_preview/<str:plantilla_nom>/', views.plantilla_preview, name='plantilla_preview'),
+    path('template_preview/<str:template_name>/', views.template_preview, name='template_preview'),
 ]

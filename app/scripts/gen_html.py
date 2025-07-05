@@ -1,25 +1,108 @@
-# Importar llibreries necessàries
-from pathlib import Path 
-import os, sys
-
-# Definim entorn on s'executarà aquest script (com si fos el root)
-base_dir = Path(__file__).resolve().parent.parent.parent  # Aquí, puja un nivell més alt per arribar a l'arrel
-sys.path.append(str(base_dir))
-
-# Importem funcions necessàries
-from app.scripts.utils import extract_json_from_text
-from app.scripts.utils import prompt_AI
-
-
-# Definir entorn de Django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
-
+import os
+import sys
+import json
+import logging
+from pathlib import Path
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
-# Funcions per rutes dinàmiques d'usuari
-def get_user_html_dir(username):
-    """Retorna la carpeta HTML de l'usuari"""
-    return settings.BASE_DIR / 'app' / 'users' / username / 'htmls'
+# Set up Django environment
+base_dir = Path(__file__).resolve().parent.parent.parent
+sys.path.append(str(base_dir))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
+import django
+django.setup()
+
+# Import Django models
+from app.models import UserContext, GeneratedCommunication
+
+# Import necessary functions
+from app.scripts.utils import extract_json_from_text, prompt_AI
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def save_user_context(username, context_data):
+    """
+    Saves the user's context to the database.
+    
+    Args:
+        username (str): The username
+        context_data (list): List of dictionaries with the structure:
+            [
+                {
+                    "type": "company" | "products" | "target_audience" | "communication_style",
+                    "title": "Section title",
+                    "content": "Detailed content"
+                },
+                ...
+            ]
+    """
+    try:
+        # Get the user
+        User = get_user_model()
+        user = User.objects.get(username=username)
+        
+        # Convert list of dictionaries to structured data
+        structured_data = {
+            "company": {},
+            "products": {},
+            "target_audience": {},
+            "communication_style": {}
+        }
+        
+        for entry in context_data:
+            section_type = entry.get("type", "company")
+            if section_type in structured_data:
+                structured_data[section_type][entry["title"]] = entry["content"]
+        
+        # Create or update the context
+        context, created = UserContext.objects.update_or_create(
+            user=user,
+            context_type='user_preferences',
+            defaults={
+                'name': 'User Preferences',
+                'context_data': structured_data,
+                'is_active': True
+            }
+        )
+        
+        logger.info(f"User context saved for {username}")
+        return context
+        
+    except Exception as e:
+        logger.error(f"Error saving user context: {str(e)}")
+        raise
+
+def get_user_context(username):
+    """
+    Retrieves the user's context from the database.
+    
+    Args:
+        username (str): The username
+        
+    Returns:
+        dict: Context data in {"title": "content"} format
+    """
+    try:
+        User = get_user_model()
+        user = User.objects.get(username=username)
+        
+        # Get the most recent active context
+        context = UserContext.objects.filter(
+            user=user, 
+            is_active=True
+        ).order_by('-updated_at').first()
+        
+        return context.context_data if context else {}
+        
+    except User.DoesNotExist:
+        logger.error(f"User {username} not found")
+        return {}
+    except Exception as e:
+        logger.error(f"Error retrieving user context: {str(e)}")
+        return {}
 
 # Accedir a les rutes configurades a settings.py
 TEMPLATE_DIR = settings.TEMPLATE_DIR
@@ -94,6 +177,25 @@ def get_base_prompt(template_name: str) -> str:
     else:
         raise ValueError(f"Unrecognized template: {template_name}")
 
+def get_context_prompt() -> str:
+    """
+    Retorna el prompt per generar el context inicial de l'usuari.
+    """
+    return (
+        "You are a context expert and need to generate a comprehensive description of a company's context.\n"
+        "The context should include:\n"
+        "1. Company information: sector, mission, values, target audience, communication style\n"
+        "2. Products and services: main offerings, unique features, competitive advantages\n"
+        "3. Target audience: demographics, preferences, communication channels\n"
+        "4. Communication preferences: tone, style, preferred channels\n"
+        "\n"
+        "Format the response as a JSON object with these keys:\n"
+        "- company_info: Detailed company description\n"
+        "- products: Product/service information\n"
+        "- target_audience: Audience characteristics\n"
+        "- communication_style: Preferred communication style\n"
+    )
+
 def get_html_prompt(template_name: str) -> str:
     """
     Returns the specific prompt to generate a JSON object that describes
@@ -105,8 +207,14 @@ def get_html_prompt(template_name: str) -> str:
             "Return a valid JSON with the following fields:\n"
             "{\n"
             "title: Catchy offer title,\n"
-            "content: Brief and appealing description of the product or offer,\n"
-            "image_url: URL of a representative image of the offer\n"
+            "message: Brief and appealing description of the product or offer,\n"
+            "cta_text: Text for the call-to-action button,\n"
+            "cta_url: URL for the call-to-action button,\n"
+            "list_item_1: First benefit or feature,\n"
+            "list_item_2: Second benefit or feature,\n"
+            "list_item_3: Third benefit or feature,\n"
+            "color_primary: Main color for gradients and accents,\n"
+            "color_secondary: Secondary color for gradients\n"
             "}\n"
             "\nDo not include any explanation or text outside the JSON."
         )
@@ -115,12 +223,14 @@ def get_html_prompt(template_name: str) -> str:
             "Return a valid JSON with the following fields:\n"
             "{\n"
             "title: General title for the tips,\n"
-            "tip_1_title: Title of the first tip,\n"
-            "tip_1_content: Content of the first tip,\n"
-            "tip_2_title: Title of the second tip,\n"
-            "tip_2_content: Content of the second tip,\n"
-            "tip_3_title: Title of the third tip (optional),\n"
-            "tip_3_content: Content of the third tip (optional)\n"
+            "feature_title_1: Title of the first tip,\n"
+            "feature_description_1: Content of the first tip,\n"
+            "feature_title_2: Title of the second tip,\n"
+            "feature_description_2: Content of the second tip,\n"
+            "feature_title_3: Title of the third tip (optional),\n"
+            "feature_description_3: Content of the third tip (optional),\n"
+            "cta_text: Text for the call-to-action button,\n"
+            "cta_url: URL for the call-to-action button\n"
             "}\n"
             "\nDo not include any explanation or text outside the JSON."
         )
@@ -143,9 +253,12 @@ def get_html_prompt(template_name: str) -> str:
             "Return a valid JSON with the following fields:\n"
             "{\n"
             "title: Welcome title,\n"
-            "welcome_message: Main welcome message,\n"
-            "next_steps: Suggested next steps or actions,\n"
-            "support_info: Support or contact information\n"
+            "message: Main welcome message,\n"
+            "list_item_1: First benefit or feature,\n"
+            "list_item_2: Second benefit or feature,\n"
+            "list_item_3: Third benefit or feature,\n"
+            "cta_text: Text for the call-to-action button,\n"
+            "cta_url: URL for the call-to-action button\n"
             "}\n"
             "\nDo not include any explanation or text outside the JSON."
         )
@@ -177,10 +290,15 @@ def get_html_prompt(template_name: str) -> str:
         return (
             "Return a valid JSON with the following fields:\n"
             "{\n"
-            "thank_you_title: Thank you title,\n"
-            "thank_you_message: Main thank you message,\n"
-            "appreciation_details: Specific details of what is appreciated,\n"
-            "future_relationship: Message about future relationship\n"
+            "title: Thank you title,\n"
+            "message: Main thank you message,\n"
+            "feature_title_1: Title for appreciation section,\n"
+            "feature_description_1: Content for appreciation section,\n"
+            "list_item_1: First next step,\n"
+            "list_item_2: Second next step,\n"
+            "list_item_3: Third next step,\n"
+            "contact_email: Email address for contact,\n"
+            "website_url: Website URL\n"
             "}\n"
             "\nDo not include any explanation or text outside the JSON."
         )
@@ -251,28 +369,106 @@ def generate_content_from_prompt(prompt: str, template_name: str) -> dict:
     return extract_json_from_text(raw_content)
 
 def render_template(template_str: str, data: dict) -> str:
-    rendered = template_str
-    for key, value in data.items():
-        rendered = rendered.replace(f"[{key}]", value)
-    return rendered
+    """
+    Render a template string with the given data.
+    
+    Args:
+        template_str (str): The template string with {variable} placeholders
+        data (dict): Dictionary of variables to replace in the template
+        
+    Returns:
+        str: Rendered template with variables replaced
+    """
+    try:
+        for key, value in (data or {}).items():
+            if value is not None:  # Only replace if value is not None
+                template_str = template_str.replace(f'{{{key}}}', str(value))
+        return template_str
+    except Exception as e:
+        logger.error(f"Error rendering template: {str(e)}")
+        raise
 
+def save_generated_communication(username: str, template_name: str, prompt: str, content: dict, html_content: str):
+    """
+    Save the generated communication to the database.
+    
+    Args:
+        username (str): The username
+        template_name (str): Name of the template used
+        prompt (str): The original prompt
+        content (dict): The generated content
+        html_content (str): The final rendered HTML
+        
+    Returns:
+        GeneratedCommunication: The saved communication object
+    """
+    try:
+        User = get_user_model()
+        user = User.objects.get(username=username)
+        
+        # Create a name for the communication
+        name = f"{template_name} - {content.get('title', 'Untitled')}"
+        
+        # Save to database
+        communication = GeneratedCommunication.objects.create(
+            user=user,
+            name=name,
+            template_name=template_name,
+            prompt=prompt,
+            content=content,
+            html_content=html_content,
+            status='completed'
+        )
+        
+        logger.info(f"Generated communication saved for user {username}")
+        return communication
+        
+    except Exception as e:
+        logger.error(f"Error saving generated communication: {str(e)}")
+        raise
 
-# Script principal per generar HTML a partir d'un prompt i una plantilla --> no usat directament a l'aplicació, però útil per proves i generació manual
-def main(prompt: str, username: str, template_name: str = "sale.html") -> None:
-    print("🔄 Generant contingut amb Groq...")
-    data = generate_content_from_prompt(prompt, template_name)
-    # Afegir imatge temporalment genèrica
-    data["image_url"] = "https://via.placeholder.com/600x300.png?text=Oferta+Especial"
-    print("📄 Carregant plantilla...")
-    template = load_template(template_name)
-    print("🧠 Renderitzant plantilla amb contingut...")
-    html_final = render_template(template, data)
-    # Guardar el resultat generat a la ruta configurada per a l'usuari
-    output_path = get_user_html_dir(username) / f'{prompt}.html'
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(html_final)
-    print(f"✅ HTML generat i guardat a: {output_path}")
+def main(prompt: str, username: str, template_name: str = "sale.html"):
+    """
+    Main function to generate HTML from a prompt and template.
+    
+    Args:
+        prompt (str): The user's prompt
+        username (str): The username
+        template_name (str): Name of the template to use
+        
+    Returns:
+        str: The generated HTML content
+    """
+    try:
+        # Load the template
+        template = load_template(template_name)
+        
+        # Get user context
+        context = get_user_context(username)
+        
+        # Build the prompt
+        full_prompt = build_prompt(template_name, prompt, context)
+        
+        # Generate content
+        content = generate_content_from_prompt(full_prompt, template_name)
+        
+        # Render the template with the generated content
+        html_content = render_template(template, content)
+        
+        # Save the communication to the database
+        save_generated_communication(
+            username=username,
+            template_name=template_name,
+            prompt=prompt,
+            content=content,
+            html_content=html_content
+        )
+        
+        return html_content
+        
+    except Exception as e:
+        logger.error(f"Error in main generation: {str(e)}")
+        raise
 
 if __name__ == "__main__":
     prompt = "Vols generar una oferta especial de descompte per un producte popular."

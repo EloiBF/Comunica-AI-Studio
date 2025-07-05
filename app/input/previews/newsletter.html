@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Newsletter</title>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: #c7d2fe;
+            --secondary-color: #8b5cf6;
+            --accent-color: #10b981;
+            --text-color: #1f2937;
+            --bg-color: #ffffff;
+            --muted-color: #6b7280;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0 0 15px 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            max-width: 80%;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .news-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .news-section:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .news-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .news-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .news-content p {
+            margin-bottom: 15px;
+            line-height: 1.7;
+        }
+
+        .read-more {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .read-more:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            background-color: #f8fafc;
+            color: var(--muted-color);
+            font-size: 0.9rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Monthly Newsletter</h1>
+            <p>July 2025 Edition - Latest Updates & Insights</p>
+        </div>
+        
+        <div class="content">
+            <div class="news-section">
+                <h2 class="news-title">Featured Story: Summer Collection Launch</h2>
+                <img src="https://via.placeholder.com/600x300/667eea/ffffff?text=Summer+Collection" alt="Summer Collection" class="news-image">
+                <div class="news-content">
+                    <p>Our highly anticipated summer collection is finally here! Discover the latest trends and must-have pieces for the season.</p>
+                    <a href="#" class="read-more">Shop Now →</a>
+                </div>
+            </div>
+            
+            <div class="news-section">
+                <h2 class="news-title">Behind the Scenes</h2>
+                <div class="news-content">
+                    <p>Ever wondered how our products are made? Take an exclusive look at our sustainable manufacturing process and meet the talented team behind your favorite items.</p>
+                    <a href="#" class="read-more">Watch Video →</a>
+                </div>
+            </div>
+            
+            <div class="news-section">
+                <h2 class="news-title">Customer Spotlight</h2>
+                <div class="news-content">
+                    <p>This month, we're highlighting one of our amazing customers and how they've incorporated our products into their daily routine.</p>
+                    <a href="#" class="read-more">Read More →</a>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <h3>Follow us on social media</h3>
+                <div class="social-links">
+                    <a href="#">Facebook</a> • 
+                    <a href="#">Instagram</a> • 
+                    <a href="#">Twitter</a> • 
+                    <a href="#">Pinterest</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p> 2025 Our Company. All rights reserved.</p>
+            <p>
+                <a href="#">Unsubscribe</a> | 
+                <a href="#">Preferences</a> | 
+                <a href="#">Privacy Policy</a>
+            </p>
+            <p>123 Business St, City, Country</p>
+        </div>
+    </div>
+</body>
+</html>

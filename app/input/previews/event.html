@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annual Client Appreciation Event</title>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: #c7d2fe;
+            --secondary-color: #8b5cf6;
+            --accent-color: #10b981;
+            --text-color: #1f2937;
+            --bg-color: #ffffff;
+            --muted-color: #6b7280;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0 0 15px 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            max-width: 80%;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .event-details {
+            margin-bottom: 25px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            width: 120px;
+            color: var(--muted-color);
+        }
+
+        .detail-value {
+            flex: 1;
+        }
+
+        .event-description {
+            margin-bottom: 30px;
+            line-height: 1.7;
+        }
+
+        .speaker-section {
+            margin-bottom: 30px;
+        }
+
+        .speaker-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .speaker-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .speaker-card {
+            display: flex;
+            align-items: center;
+        }
+
+        .speaker-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 15px;
+            background-color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .speaker-info {
+            flex: 1;
+        }
+
+        .speaker-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .speaker-role {
+            color: var(--muted-color);
+            font-size: 0.9rem;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+
+        .cta-button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            background-color: #f8fafc;
+            color: var(--muted-color);
+            font-size: 0.9rem;
+            border-top: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Annual Client Appreciation Event</h1>
+            <p>Join us for an evening of networking and celebration</p>
+        </div>
+        
+        <div class="content">
+            <div class="event-details">
+                <div class="detail-row">
+                    <div class="detail-label">Date:</div>
+                    <div class="detail-value">September 15, 2025</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Time:</div>
+                    <div class="detail-value">6:00 PM - 9:00 PM</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Location:</div>
+                    <div class="detail-value">Grand Conference Center, 123 Business Ave</div>
+                </div>
+            </div>
+            
+            <div class="event-description">
+                <p>We're excited to invite you to our exclusive client appreciation event to celebrate our partnership and your continued trust in our services.</p>
+                <p>This special evening will feature keynote speakers from industry leaders, networking opportunities with fellow professionals, and insights into upcoming service enhancements.</p>
+            </div>
+            
+            <div class="speaker-section">
+                <h2 class="speaker-title">Featured Speakers</h2>
+                <div class="speaker-grid">
+                    <!-- Add speaker cards here -->
+                </div>
+            </div>
+            
+            <div class="cta-section">
+                <a href="#" class="cta-button">RSVP Now</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p> 2025 Professional Services Group. All rights reserved.</p>
+            <p>
+                <a href="#">Privacy Policy</a> | 
+                <a href="#">Terms of Service</a> | 
+                <a href="#">Contact Us</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,166 +1,40 @@
-
 <!DOCTYPE html>
-<html lang="ca">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Benvinguda</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            margin: 0 0 15px 0;
-            font-size: 2.5rem;
-            font-weight: 700;
-        }
-
-        .welcome-message {
-            color: rgba(255,255,255,0.9);
-            font-size: 1.2rem;
-            margin: 0;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .benefits {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            padding: 25px;
-            border-radius: 12px;
-            margin: 25px 0;
-        }
-
-        .benefits h2 {
-            color: #374151;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
-            font-weight: 600;
-        }
-
-        .benefit-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            padding: 8px 0;
-        }
-
-        .benefit-icon {
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border-radius: 50%;
-            margin-right: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        .benefit-item span {
-            font-size: 1rem;
-            color: #475569;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white !important;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin: 20px auto;
-            text-align: center;
-            transition: transform 0.2s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .cta-button:hover {
-            transform: translateY(-2px);
-        }
-
-        .footer {
-            background-color: #f8fafc;
-            padding: 20px 30px;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #64748b;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .center {
-            text-align: center;
-        }
-
-        .next-steps {
-            font-size: 1rem;
-            color: #475569;
-            text-align: center;
-            margin: 20px 0;
-        }
-    </style>
+    <title>[title]</title>
+    <link rel="stylesheet" href="/static/templates.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>[welcome_title]</h1>
-            <p class="welcome-message">[welcome_message]</p>
+            <h1>[title]</h1>
+            <p>[subtitle]</p>
         </div>
         
         <div class="content">
-            <div class="benefits">
-                <h2>Què pots esperar:</h2>
-                <div class="benefit-item">
-                    <div class="benefit-icon">✓</div>
-                    <span>[benefit_1]</span>
-                </div>
-                <div class="benefit-item">
-                    <div class="benefit-icon">✓</div>
-                    <span>[benefit_2]</span>
-                </div>
-                <div class="benefit-item">
-                    <div class="benefit-icon">✓</div>
-                    <span>[benefit_3]</span>
-                </div>
+            <div class="image-section">
+                <img src="[image_1]" alt="Welcome Image" class="main-image">
             </div>
-
-            <p class="next-steps">[next_steps]</p>
-
-            <div class="center">
-                <a href="[cta_url]" class="cta-button">[cta_text]</a>
+            
+            <div class="text-content">
+                <p>[content_1]</p>
+                <p>[content_2]</p>
+            </div>
+            
+            <div class="cta-section">
+                <a href="#" class="cta-button">[cta_text]</a>
             </div>
         </div>
         
         <div class="footer">
-            Benvingut a la nostra comunitat! Si tens preguntes, no dubtis en contactar-nos.
+            <p> 2025 [Company Name]. All rights reserved.</p>
+            <p>
+                <a href="#">Privacy Policy</a> | 
+                <a href="#">Terms of Service</a> | 
+                <a href="#">Contact Us</a>
+            </p>
         </div>
     </div>
 </body>

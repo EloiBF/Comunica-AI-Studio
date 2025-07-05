@@ -1,186 +1,52 @@
-
 <!DOCTYPE html>
-<html lang="ca">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Esdeveniment</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 2.2rem;
-            font-weight: 700;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .event-banner {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            color: #92400e;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 25px;
-            border-left: 5px solid #f59e0b;
-        }
-
-        .event-banner h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        .event-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
-            margin: 25px 0;
-        }
-
-        .detail-box {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            border: 2px solid #fbbf24;
-            transition: transform 0.2s ease;
-        }
-
-        .detail-box:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
-        }
-
-        .detail-box h3 {
-            color: #d97706;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .detail-box p {
-            font-weight: 600;
-            color: #92400e;
-            margin: 0;
-            font-size: 0.95rem;
-        }
-
-        .register-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white !important;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin: 25px auto;
-            text-align: center;
-            transition: transform 0.2s ease;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-        }
-
-        .register-button:hover {
-            transform: translateY(-2px);
-        }
-
-        .footer {
-            background-color: #f8fafc;
-            padding: 20px 30px;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #64748b;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .center {
-            text-align: center;
-        }
-
-        .event-description {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #475569;
-            margin-bottom: 20px;
-        }
-
-        .event-highlights {
-            color: #475569;
-            margin: 20px 0;
-        }
-    </style>
+    <title>[title]</title>
+    <link rel="stylesheet" href="/static/templates.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>[event_title]</h1>
+            <h1>[title]</h1>
+            <p>[subtitle]</p>
         </div>
         
         <div class="content">
-            <div class="event-banner">
-                <h2>[event_subtitle]</h2>
+            <div class="image-section">
+                <img src="[image_1]" alt="Event image" class="main-image">
             </div>
-
-            <p class="event-description">[event_description]</p>
-
-            <div class="event-details">
-                <div class="detail-box">
-                    <h3>Data</h3>
-                    <p>[event_date]</p>
+            
+            <div class="text-content">
+                <p>[content_1]</p>
+                <p>[content_2]</p>
+            </div>
+            
+            <div class="details">
+                <div class="detail-item">
+                    <strong>Date:</strong> [event_date]
                 </div>
-                <div class="detail-box">
-                    <h3>Hora</h3>
-                    <p>[event_time]</p>
+                <div class="detail-item">
+                    <strong>Time:</strong> [event_time]
                 </div>
-                <div class="detail-box">
-                    <h3>Lloc</h3>
-                    <p>[event_location]</p>
-                </div>
-                <div class="detail-box">
-                    <h3>Durada</h3>
-                    <p>[event_duration]</p>
+                <div class="detail-item">
+                    <strong>Location:</strong> [event_location]
                 </div>
             </div>
-
-            <p class="event-highlights">[event_highlights]</p>
-
-            <div class="center">
-                <a href="[register_url]" class="register-button">[register_text]</a>
+            
+            <div class="cta-section">
+                <a href="#" class="cta-button">[cta_text]</a>
             </div>
         </div>
         
         <div class="footer">
-            Places limitades. Registra't aviat per assegurar la teva participació!
+            <p> 2025 [Company Name]. All rights reserved.</p>
+            <p>
+                <a href="#">Privacy Policy</a> | 
+                <a href="#">Terms of Service</a> | 
+                <a href="#">Contact Us</a>
+            </p>
         </div>
     </div>
 </body>

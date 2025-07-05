@@ -1,203 +1,58 @@
-
 <!DOCTYPE html>
-<html lang="ca">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comunicació Estacional</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, [primary_color] 0%, [secondary_color] 100%);
-            color: #333;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-
-        .seasonal-header {
-            background: linear-gradient(135deg, [primary_color], [secondary_color]);
-            color: white;
-            padding: 40px 30px;
-            text-align: center;
-        }
-
-        .seasonal-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-
-        .seasonal-header h1 {
-            margin: 0 0 10px 0;
-            font-size: 2.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            font-weight: 700;
-        }
-
-        .seasonal-header p {
-            margin: 0;
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .seasonal-message {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            text-align: center;
-            color: #475569;
-            margin-bottom: 25px;
-        }
-
-        .celebration-message {
-            background: linear-gradient(135deg, [light_color] 0%, rgba(255,255,255,0.8) 100%);
-            padding: 25px;
-            border-radius: 12px;
-            margin: 25px 0;
-            text-align: center;
-            border: 3px solid [accent_color];
-        }
-
-        .celebration-message h2 {
-            color: [primary_color];
-            margin-bottom: 15px;
-            font-size: 1.4rem;
-            font-weight: 600;
-        }
-
-        .celebration-message p {
-            margin: 0;
-            font-size: 1.1rem;
-            color: #475569;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 20px;
-            margin: 25px 0;
-        }
-
-        .feature-card {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            border: 2px solid [accent_color];
-            transition: transform 0.2s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .feature-card h3 {
-            color: [primary_color];
-            margin-bottom: 10px;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .feature-card p {
-            margin: 0;
-            color: #475569;
-            font-size: 0.95rem;
-        }
-
-        .seasonal-button {
-            display: inline-block;
-            background: linear-gradient(135deg, [primary_color], [secondary_color]);
-            color: white !important;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin: 25px auto;
-            text-align: center;
-            transition: transform 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .seasonal-button:hover {
-            transform: translateY(-2px);
-        }
-
-        .footer {
-            background-color: #f8fafc;
-            padding: 20px 30px;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #64748b;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .center {
-            text-align: center;
-        }
-
-        .special-offer {
-            text-align: center;
-            font-size: 1.1rem;
-            color: #475569;
-            margin: 20px 0;
-        }
-    </style>
+    <title>[title]</title>
+    <link rel="stylesheet" href="/static/templates.css">
 </head>
 <body>
     <div class="container">
-        <div class="seasonal-header">
-            <div class="seasonal-icon">[seasonal_icon]</div>
-            <h1>[seasonal_title]</h1>
-            <p>[seasonal_subtitle]</p>
+        <div class="header">
+            <h1>[title]</h1>
+            <p>[subtitle]</p>
         </div>
         
         <div class="content">
-            <p class="seasonal-message">[seasonal_message]</p>
-
-            <div class="celebration-message">
-                <h2>[celebration_title]</h2>
-                <p>[celebration_message]</p>
+            <div class="image-section">
+                <img src="[image_1]" alt="Seasonal Offer Image" class="main-image">
             </div>
-
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <h3>[feature_1_title]</h3>
-                    <p>[feature_1_description]</p>
+            
+            <div class="text-content">
+                <p>[content_1]</p>
+                <p>[content_2]</p>
+            </div>
+            
+            <div class="offers-grid">
+                <div class="offer-card">
+                    <div class="offer-badge">[offer_1_badge]</div>
+                    <h3>[offer_1_title]</h3>
+                    <p class="original-price">$[offer_1_original_price]</p>
+                    <p class="sale-price">$[offer_1_sale_price]</p>
+                    <a href="#" class="offer-button">[offer_1_cta]</a>
                 </div>
-                <div class="feature-card">
-                    <h3>[feature_2_title]</h3>
-                    <p>[feature_2_description]</p>
-                </div>
-                <div class="feature-card">
-                    <h3>[feature_3_title]</h3>
-                    <p>[feature_3_description]</p>
+                
+                <div class="offer-card">
+                    <div class="offer-badge">[offer_2_badge]</div>
+                    <h3>[offer_2_title]</h3>
+                    <p class="sale-price">$[offer_2_sale_price]</p>
+                    <a href="#" class="offer-button">[offer_2_cta]</a>
                 </div>
             </div>
-
-            <p class="special-offer">[special_offer_message]</p>
-
-            <div class="center">
-                <a href="[cta_url]" class="seasonal-button">[cta_text]</a>
+            
+            <div class="cta-section">
+                <a href="#" class="cta-button">[cta_text]</a>
+                <p class="expiration">Offers expire [expiration_date]</p>
             </div>
         </div>
         
         <div class="footer">
-            [closing_message] - Equip de [company_name]
+            <p> 2025 [Company Name]. All rights reserved.</p>
+            <p>
+                <a href="#">Shop Now</a> | 
+                <a href="#">Contact Us</a> | 
+                <a href="#">Unsubscribe</a>
+            </p>
         </div>
     </div>
 </body>

@@ -1,30 +1,36 @@
+import os
+import sys
+from pathlib import Path
+from datetime import datetime
+from mimetypes import guess_type
+import json
 from django.shortcuts import render, redirect
 from django.conf import settings
-import os,sys
-from pathlib import Path
-import json
-from django.http import JsonResponse
-from datetime import datetime
-from django.http import HttpResponse, Http404
-from mimetypes import guess_type
+from django.http import JsonResponse, HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.utils.timezone import now
 
-# Definim entorn on s'executarà aquest script (com si fos el root)
-base_dir = Path(__file__).resolve().parent.parent.parent  # Aquí, puja un nivell més alt per arribar a l'arrel
+# Añadir el directorio raíz al path para imports
+base_dir = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(base_dir))
 
-from app.scripts.utils import get_user_folder_path
+# Importaciones de la aplicación
 from app.scripts.gen_html import generate_content_from_prompt, render_template
+from app.scripts.utils import (
+    get_user_folder_path,
+    get_user_communications_folder,
+    load_communications,
+    delete_communication,
+    save_communication
+)
 from core.models import UserProfile
 
 
 # Landing page (pública)
 def landing(request):
     return render(request, 'landing.html')
-
 
 # Signup
 def signup_view(request):
@@ -75,8 +81,10 @@ def logout_view(request):
 #  Serveix els fitxers generats
 @login_required
 def generated_file(request, filename):
-    # Usar carpeta HTML específica per l'usuari
-    user_htmls_folder = get_user_folder_path(request.user.username, 'htmls')
+    """
+    Sirve archivos generados desde la carpeta de comunicaciones del usuario
+    """
+    user_htmls_folder = get_user_communications_folder(request.user.username)
     file_path = os.path.join(user_htmls_folder, filename)
 
     if not os.path.exists(file_path):
@@ -89,36 +97,104 @@ def generated_file(request, filename):
 # Pàgines per l'àrea autenticada
 @login_required
 def dashboard(request):
-    return render(request, 'dashboard.html')
+    """
+    Muestra el dashboard con las comunicaciones generadas por el usuario
+    """
+    user_folder = get_user_communications_folder(request.user.username)
+    generated_metadata = load_communications(user_folder)
+
+    return render(request, 'dashboard.html', {
+        'generated_metadata': generated_metadata
+    })
 
 @login_required
 def context_view(request):
-    return render(request, 'context.html')
+    from app.scripts.gen_html import get_user_context, save_user_context
+    
+    if request.method == 'POST':
+        # Process form data
+        context_data = []
+        i = 1
+        while True:
+            title_key = f'title_{i}'
+            content_key = f'content_{i}'
+            type_key = f'type_{i}'  # New field to specify the type of context
+            
+            if title_key not in request.POST or content_key not in request.POST:
+                break
+                
+            title = request.POST[title_key].strip()
+            content = request.POST[content_key].strip()
+            type = request.POST.get(type_key, 'company').strip().lower()  # Default to 'company'
+            
+            if title and content:  # Only add non-empty entries
+                context_data.append({
+                    'type': type,
+                    'title': title,
+                    'content': content
+                })
+                
+            i += 1
+        
+        # Save the context data
+        if context_data:
+            save_user_context(request.user.username, context_data)
+            
+        # Redirect to prevent form resubmission
+        return redirect('context')
+    
+    # Load existing context data
+    context_data = get_user_context(request.user.username)
+    
+    # Prepare context for the template
+    context_entries = []
+    context_types = ['company', 'products', 'target_audience', 'communication_style']
+    
+    # Add existing entries
+    for context_type in context_types:
+        if context_type in context_data:
+            for title, content in context_data[context_type].items():
+                context_entries.append({
+                    'id': len(context_entries) + 1,
+                    'type': context_type,
+                    'title': title,
+                    'content': content
+                })
+    
+    return render(request, 'context.html', {
+        'context_entries': context_entries,
+        'context_types': context_types,
+        'next_id': len(context_entries) + 1 if context_entries else 1
+    })
 
 @login_required
 def generate(request):
+    """
+    Vista para generar nuevas comunicaciones y gestionar las existentes
+    """
+    # Configuración de rutas
     TEMPLATE_DIR = settings.TEMPLATE_DIR
     username = request.user.username
-
-    # Carpeta HTML per a l’usuari
-    user_htmls_folder = get_user_folder_path(username, 'htmls')
-    HTML_OUTPUT = user_htmls_folder
+    
+    # Obtener carpeta de comunicaciones del usuario
+    HTML_OUTPUT = get_user_communications_folder(username)
     os.makedirs(HTML_OUTPUT, exist_ok=True)
 
-    # Carpeta Clusters
-    clusters_folder = get_user_folder_path(username, 'clusters')
-    clustering_files = [f for f in os.listdir(clusters_folder) if f.endswith('_clustering_summary.json')] if os.path.exists(clusters_folder) else []
-    
-    # Definició de les plantilles disponibles
+    # Cargar clusters disponibles
+    clusters_folder = os.path.join(settings.BASE_DIR, 'app', 'users', username, 'clusters')
+    os.makedirs(clusters_folder, exist_ok=True)
+    clustering_files = [f for f in os.listdir(clusters_folder) if f.endswith('_clustering_summary.json')]
+
+    # Definición de las plantillas disponibles
     TEMPLATES = [
-    ('sale.html', '💰', 'Vendes', 'Promocions i ofertes comercials'),
-    ('tips.html', '💡', 'Consells', 'Consells útils i pràctics'),
-    ('welcome.html', '👋', 'Benvinguda', 'Missatges de benvinguda'),
-    ('survey.html', '📊', 'Enquesta', "Recollida d'opinions"),
-    ('thank_you.html', '🙏', 'Agraïment', 'Missatges de gratitud'),
-    ('reminder.html', '⏰', 'Recordatori', 'Recordatoris i avisos'),
-    ('announcement.html', '📢', 'Anunci', 'Comunicats oficials'),
-]
+        ('sale.html', '💰', 'Vendes', 'Promocions i ofertes comercials'),
+        ('tips.html', '💡', 'Consells', 'Consells útils i pràctics'),
+        ('welcome.html', '👋', 'Benvinguda', 'Missatges de benvinguda'),
+        ('survey.html', '📊', 'Enquesta', "Recollida d'opinions"),
+        ('thank_you.html', '🙏', 'Agraïment', 'Missatges de gratitud'),
+        ('reminder.html', '⏰', 'Recordatori', 'Recordatoris i avisos'),
+        ('announcement.html', '📢', 'Anunci', 'Comunicats oficials'),
+    ]
 
     available_datasets = []
     for file_name in clustering_files:
@@ -157,11 +233,7 @@ def generate(request):
     if request.method == "POST" and request.POST.get("action") == "delete":
         filename = request.POST.get("filename")
         if filename:
-            base_name = os.path.splitext(filename)[0]
-            html_path = os.path.join(HTML_OUTPUT, base_name + ".html")
-            json_path = os.path.join(HTML_OUTPUT, base_name + ".json")
-            if os.path.exists(html_path): os.remove(html_path)
-            if os.path.exists(json_path): os.remove(json_path)
+            delete_communication(HTML_OUTPUT, filename)
         return redirect("generate")
 
     # POST: generar nova comunicació
@@ -181,27 +253,29 @@ def generate(request):
 
             rendered_html = render_template(template, generated_data)
 
-            file_base = communication_name.replace(' ', '_').lower()
-            html_filename = f"{file_base}.html"
-            json_filename = f"{file_base}.json"
-
-            html_path = os.path.join(HTML_OUTPUT, html_filename)
-            json_path = os.path.join(HTML_OUTPUT, json_filename)
-
-            with open(html_path, 'w', encoding='utf-8') as f:
-                f.write(rendered_html)
-
-            metadata = {
-                "name": communication_name,
-                "prompt": prompt,
-                "template": selected_template,
-                "dataset": dataset_name if dataset_name else None,
-                "cluster": cluster_id if cluster_id else None,
-                "created_at": now().isoformat()
+            # Obtener colores del formulario o usar valores por defecto
+            colors = {
+                'primary_color': request.POST.get('primary_color', '#667eea'),
+                'secondary_color': request.POST.get('secondary_color', '#764ba2'),
+                'accent_color': request.POST.get('accent_color', '#4a90e2'),
+                'background_color': request.POST.get('background_color', '#ffffff'),
+                'text_color': request.POST.get('text_color', '#333333')
             }
-            with open(json_path, 'w', encoding='utf-8') as f:
-                json.dump(metadata, f, indent=4, ensure_ascii=False)
-
+            
+            # Guardar comunicación con metadatos incluyendo colores
+            metadata = {
+                'name': communication_name,
+                'template': selected_template,
+                'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'dataset': dataset_name,
+                'cluster': cluster_id,
+                'prompt': prompt,
+                'colors': colors  # Añadir los colores a los metadatos
+            }
+            
+            # Guardar usando la función de utilidad
+            html_filename, _ = save_communication(HTML_OUTPUT, rendered_html, metadata)
+            return redirect('generated_file', filename=html_filename)
         except FileNotFoundError:
             return render(request, template_name, {
                 'generated_content': "❌ Plantilla no trobada.",
@@ -209,33 +283,12 @@ def generate(request):
                 'generated_html_files': [],
                 'subscription': subscription,
                 'available_datasets': available_datasets,
-                'templates': TEMPLATES,  # 👈 AFEGIT
+                'templates': TEMPLATES,  # 
             })
 
-        return render(request, template_name, {
-            'generated_content': rendered_html,
-            'generated_metadata': [metadata],
-            'generated_html_files': [html_filename],
-            'subscription': subscription,
-            'available_datasets': available_datasets,
-            'templates': TEMPLATES,  # 👈 AFEGIT
-        })
-
-
     # GET: mostrar comunicacions existents
-    generated_metadata = []
+    generated_metadata = load_communications(HTML_OUTPUT)
     generated_html_files = [f for f in os.listdir(HTML_OUTPUT) if f.endswith('.html')]
-
-    for filename in os.listdir(HTML_OUTPUT):
-        if filename.endswith('.json'):
-            json_path = os.path.join(HTML_OUTPUT, filename)
-            try:
-                with open(json_path, 'r', encoding='utf-8') as json_file:
-                    metadata = json.load(json_file)
-                    metadata['filename'] = filename.replace('.json', '.html')
-                    generated_metadata.append(metadata)
-            except (json.JSONDecodeError, FileNotFoundError) as e:
-                print(f"Error carregant metadades de {filename}: {e}")
 
     return render(request, template_name, {
         'generated_content': None,
@@ -246,40 +299,92 @@ def generate(request):
         'templates': TEMPLATES,  # 👈 AFEGIT
     })
 
-
-
-
-
-
+def _adjust_color(color, amount=30):
+    """
+    Lighten or darken a color by a given amount.
+    Amount should be between -255 (darker) and 255 (lighter).
+    """
+    try:
+        color = color.lstrip('#')
+        r, g, b = int(color[0:2], 16), int(color[2:4], 16), int(color[4:6], 16)
+        
+        r = max(0, min(255, r + amount))
+        g = max(0, min(255, g + amount))
+        b = max(0, min(255, b + amount))
+        
+        return f"#{r:02x}{g:02x}{b:02x}"
+    except:
+        return color
 
 @login_required
-def plantilla_preview(request, plantilla_nom):
-    # Obtens la ruta completa de la plantilla
-    TEMPLATE_DIR = settings.TEMPLATE_DIR
-    nom_arxiu = plantilla_nom if plantilla_nom.endswith(".html") else f"{plantilla_nom}.html"
-    ruta = os.path.join(TEMPLATE_DIR, nom_arxiu)
+def template_preview(request, template_name):
+    # Get the template path
+    PREVIEWS_DIR = settings.PREVIEWS_DIR
+    template_file = template_name if template_name.endswith(".html") else f"{template_name}.html"
+    template_path = os.path.join(PREVIEWS_DIR, template_file)
 
-    # Comprovar si el fitxer existeix
-    if not os.path.exists(ruta):
-        raise Http404("Plantilla no trobada.")
+    # Check if file exists
+    if not os.path.exists(template_path):
+        raise Http404("Template not found.")
     
-    # Intentem llegir el contingut de la plantilla
+    # Get the primary color from query parameters, default to #667eea (indigo)
+    primary_color = request.GET.get('color', '#667eea')
+    
+    # Read the template content
     try:
-        with open(ruta, 'r', encoding='utf-8') as f:
-            contingut = f.read()
-        return HttpResponse(contingut)  # Retornem el contingut com a HTML
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template_content = f.read()
+        
+        # Generate color variants
+        primary_hover = _adjust_color(primary_color, -10)
+        primary_light = _adjust_color(primary_color, 40)
+        
+        # Add dynamic CSS for the primary color
+        dynamic_css = f"""
+        <style>
+            :root {{
+                --primary-color: {primary_color};
+                --primary-hover: {primary_hover};
+                --primary-light: {primary_light};
+            }}
+            
+            /* Add any specific element styling that uses the primary color */
+            .btn-primary {{
+                background-color: var(--primary-color);
+                border-color: var(--primary-color);
+            }}
+            .btn-primary:hover {{
+                background-color: var(--primary-hover);
+                border-color: var(--primary-hover);
+            }}
+            .text-primary {{
+                color: var(--primary-color) !important;
+            }}
+            .bg-primary {{
+                background-color: var(--primary-color) !important;
+            }}
+        </style>
+        """
+        
+        # Insert the dynamic CSS right after the opening <head> tag
+        if '</head>' in template_content:
+            template_content = template_content.replace('</head>', f"{dynamic_css}</head>")
+        else:
+            # If no head tag, add one at the beginning
+            template_content = f"<head>{dynamic_css}</head>{template_content}"
+        
+        # Create a response with the modified template
+        response = HttpResponse(template_content, content_type='text/html')
+        
+        # Allow the iframe to be embedded
+        response['X-Frame-Options'] = 'ALLOW-FROM *'
+        response['Content-Security-Policy'] = "frame-ancestors *"
+        
+        return response
     except Exception as e:
-        raise Http404(f"Error al carregar la plantilla: {str(e)}")
-
-
-
-
-
-
-
-
-
-
+        import traceback
+        traceback.print_exc()
+        raise Http404(f"Error loading template: {str(e)}")
 
 
 @login_required
@@ -398,6 +503,7 @@ def clusters(request):
         'message': message,
         'max_datasets': 3
     })
+
 
 @login_required
 def delete_dataset(request):

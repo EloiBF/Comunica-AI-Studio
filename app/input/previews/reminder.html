@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friendly Reminder: Your Next Step</title>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: #c7d2fe;
+            --secondary-color: #8b5cf6;
+            --accent-color: #10b981;
+            --text-color: #1f2937;
+            --bg-color: #ffffff;
+            --muted-color: #6b7280;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .content {
+            padding: 20px 0;
+        }
+
+        .reminder-card {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .reminder-details {
+            margin-bottom: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .detail-label {
+            flex: 1;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .detail-value {
+            flex: 2;
+            color: var(--text-color);
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .secondary-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .help-section {
+            background-color: var(--primary-light);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            color: var(--muted-color);
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Friendly Reminder</h1>
+            <p>Just a quick note about your upcoming appointment with us.</p>
+        </div>
+        
+        <div class="content">
+            <p>Hello [Customer Name],</p>
+            
+            <p>We noticed you haven't completed your order yet. This is a friendly reminder about the items waiting in your cart.</p>
+            
+            <div class="reminder-card">
+                <h2>Your Pending Order</h2>
+                <div class="reminder-details">
+                    <div class="detail-row">
+                        <div class="detail-label">Order #:</div>
+                        <div class="detail-value">ORD-2025-0124</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Items:</div>
+                        <div class="detail-value">3 items in cart</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Total:</div>
+                        <div class="detail-value">$147.95</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Expires in:</div>
+                        <div class="detail-value"><strong style="color: var(--accent-color);">24 hours</strong> (July 5, 2025, 2:30 PM)</div>
+                    </div>
+                </div>
+                
+                <a href="#" class="cta-button">Complete Your Order</a>
+                <a href="#" class="secondary-button">View Cart</a>
+            </div>
+            
+            <p>Your cart contains items that other customers are interested in. Complete your purchase now to ensure availability.</p>
+            
+            <div class="help-section">
+                <h3>Need help with your order?</h3>
+                <p>Our customer service team is available 24/7 to assist you with any questions or concerns you might have.</p>
+                <a href="#" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Contact Support →</a>
+            </div>
+            
+            <p>Thank you for choosing us!</p>
+            <p>Best regards,<br>The Customer Support Team</p>
+        </div>
+        
+        <div class="footer">
+            <p> 2025 Our Company. All rights reserved.</p>
+            <p style="margin-top: 15px;">
+                <a href="#">Privacy Policy</a> • 
+                <a href="#">Terms of Service</a> • 
+                <a href="#">Unsubscribe</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

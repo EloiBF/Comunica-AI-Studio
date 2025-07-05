@@ -1,186 +1,65 @@
 
 <!DOCTYPE html>
-<html lang="ca">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enquesta</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 2.2rem;
-            font-weight: 700;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .survey-intro {
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            border-left: 5px solid #0ea5e9;
-        }
-
-        .survey-intro p {
-            margin: 0;
-            font-size: 1.1rem;
-            color: #0c4a6e;
-        }
-
-        .question-section {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border: 2px solid #e2e8f0;
-        }
-
-        .question-section h3 {
-            color: #0369a1;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-            font-weight: 600;
-        }
-
-        .question-section ul {
-            color: #64748b;
-            line-height: 1.8;
-            margin: 0;
-            padding-left: 20px;
-        }
-
-        .incentive-box {
-            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-            margin: 25px 0;
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
-        }
-
-        .incentive-box h3 {
-            margin: 0 0 10px 0;
-            font-size: 1.4rem;
-            font-weight: 600;
-        }
-
-        .incentive-box p {
-            margin: 0;
-            opacity: 0.9;
-        }
-
-        .survey-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
-            color: white !important;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin: 20px auto;
-            text-align: center;
-            transition: transform 0.2s ease;
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
-        }
-
-        .survey-button:hover {
-            transform: translateY(-2px);
-        }
-
-        .footer {
-            background-color: #f8fafc;
-            padding: 20px 30px;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #64748b;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .center {
-            text-align: center;
-        }
-
-        .time-estimate {
-            text-align: center;
-            font-weight: 600;
-            color: #0369a1;
-            margin: 20px 0;
-            font-size: 1.1rem;
-        }
-
-        .purpose-text {
-            color: #475569;
-            margin-bottom: 20px;
-        }
-    </style>
+    <title>[title]</title>
+    <link rel="stylesheet" href="/static/templates.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>[survey_title]</h1>
+            <h1>[title]</h1>
+            <p>[subtitle]</p>
         </div>
         
         <div class="content">
-            <div class="survey-intro">
-                <p>[survey_intro]</p>
+            <div class="image-section">
+                <img src="[image_1]" alt="Survey Image" class="main-image">
             </div>
-
-            <p class="purpose-text">[survey_purpose]</p>
-
-            <div class="question-section">
-                <h3>El que t'preguntarem:</h3>
-                <ul>
-                    <li>[question_topic_1]</li>
-                    <li>[question_topic_2]</li>
-                    <li>[question_topic_3]</li>
-                </ul>
+            
+            <div class="text-content">
+                <p>[content_1]</p>
+                <p>[content_2]</p>
             </div>
-
-            <div class="incentive-box">
-                <h3>🎁 [incentive_title]</h3>
-                <p>[incentive_description]</p>
+            
+            <div class="survey-questions">
+                <div class="survey-question">
+                    <h3>[question_1]</h3>
+                    <div class="survey-options">
+                        <label><input type="radio" name="q1" value="1"> 1 (Strongly Disagree)</label>
+                        <label><input type="radio" name="q1" value="2"> 2</label>
+                        <label><input type="radio" name="q1" value="3"> 3</label>
+                        <label><input type="radio" name="q1" value="4"> 4</label>
+                        <label><input type="radio" name="q1" value="5"> 5 (Strongly Agree)</label>
+                    </div>
+                </div>
+                
+                <div class="survey-question">
+                    <h3>[question_2]</h3>
+                    <div class="survey-options">
+                        <label><input type="radio" name="q2" value="1"> 1 (Strongly Disagree)</label>
+                        <label><input type="radio" name="q2" value="2"> 2</label>
+                        <label><input type="radio" name="q2" value="3"> 3</label>
+                        <label><input type="radio" name="q2" value="4"> 4</label>
+                        <label><input type="radio" name="q2" value="5"> 5 (Strongly Agree)</label>
+                    </div>
+                </div>
             </div>
-
-            <p class="time-estimate">⏱️ Temps estimat: [estimated_time]</p>
-
-            <div class="center">
-                <a href="[survey_url]" class="survey-button">[survey_button_text]</a>
+            
+            <div class="cta-section">
+                <a href="#" class="cta-button">[cta_text]</a>
             </div>
         </div>
         
         <div class="footer">
-            Les teves respostes són confidencials i ens ajuden a millorar els nostres serveis.
+            <p> 2025 [Company Name]. All rights reserved.</p>
+            <p>
+                <a href="#">Privacy Policy</a> | 
+                <a href="#">Terms of Service</a> | 
+                <a href="#">Contact Us</a>
+            </p>
         </div>
     </div>
 </body>
